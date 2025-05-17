@@ -1,114 +1,105 @@
-%{
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt; // Para malloc, exit, atof, atoi
-#include &lt;string.h&gt; // Para strncpy, strdup
-#include &quot;ast.hpp&quot;      // Para yylval si es complejo
-#include &quot;parser.tab.h&quot; // Para los tokens (T_IDENTIFIER, etc.) y YYSTYPE (yylval)
+%{ 
+#include <stdio.h>
+#include <stdlib.h>    // malloc, exit, atof, atoi
+#include <string.h>    // strncpy, strdup
+#include "ast.hpp"     // para YYSTYPE complejo
+#include "parser.tab.h"// tokens T_IDENTIFIER, YYSTYPE, etc.
 
-// Prototipo de yyerror para que el scanner pueda llamarlo.
-extern void yyerror(const char \*s);
+/* Prototipo para manejar errores desde el scanner */
+extern void yyerror(const char *s);
 
-// Función para duplicar yytext y asegurar que la cadena termine en null.
-char\* copy\_yytext() {
-char\* new\_str = (char\*)malloc(yyleng + 1);
-if (new\_str == NULL) {
-yyerror("Error de memoria en copy\_yytext");
-exit(EXIT\_FAILURE);
+/* Función auxiliar para copiar yytext */
+char *copy_yytext() {
+    char *new_str = (char*)malloc(yyleng + 1);
+    if (!new_str) {
+        yyerror("Error de memoria en copy_yytext");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(new_str, yytext, yyleng);
+    new_str[yyleng] = '\0';
+    return new_str;
 }
-strncpy(new\_str, yytext, yyleng);
-new\_str[yyleng] = '\\0';
-return new\_str;
-}
-
 %}
 
-%option yylineno
-%option noyywrap
+%option nounput     
+%option yylineno noyywrap
 
 DIGIT       [0-9]
-ID          [a-zA-Z\_][a-zA-Z0-9\_]*
-WHITESPACE  [ \\t\\r]+
-NEWLINE     \\n
+ID          [a-zA-Z_][a-zA-Z0-9_]*
+WHITESPACE  [ \t\r]+
+NEWLINE     \n
 
 %%
 
-{WHITESPACE}            { /\* Ignorar espacios en blanco, tabuladores, retornos de carro */ }
-{NEWLINE}               { /* yylineno se actualiza automáticamente por Flex. No es necesario hacer nada aquí. \*/ }
+{WHITESPACE}       { /* Ignorar espacios, tabuladores y retornos de carro */ }
+{NEWLINE}          { /* Flex actualiza yylineno automáticamente */ }
 
-"//".\* { /\* Ignorar comentarios de una línea */ }
-"/*"([^\*]|\*+[^\*/])*\*+"/" { /* Ignorar comentarios de bloque (manejo básico) \*/ }
+"//".*             { /* Ignorar comentario de línea */ }
+"/*"([^*]|\*+[^*/])*\*+"/" { /* Ignorar comentario de bloque */ }
 
-"int"                   { return T\_INT; }
-"float"                 { return T\_FLOAT; }
-"string"                { return T\_STRING\_TYPE; }
-"if"                    { return T\_IF; }
-"else"                  { return T\_ELSE; }
-"while"                 { return T\_WHILE; }
-"print"                 { return T\_PRINT; }
-"read"                  { return T\_READ; }
+"int"              { return T_INT; }
+"float"            { return T_FLOAT; }
+"string"           { return T_STRING_TYPE; }
+"if"               { return T_IF; }
+"else"             { return T_ELSE; }
+"while"            { return T_WHILE; }
+"print"            { return T_PRINT; }
+"read"             { return T_READ; }
 
-"="                     { return T\_ASSIGN; }
-"+"                     { return T\_PLUS; }
-"-"                     { return T\_MINUS; }
-"\*"                     { return T\_MULTIPLY; }
-"/"                     { return T\_DIVIDE; }
+"="                { return T_ASSIGN; }
+"+"                { return T_PLUS; }
+"-"                { return T_MINUS; }
+"*"                { return T_MULTIPLY; }
+"/"                { return T_DIVIDE; }
 
-"=="                    { return T\_EQ; }
-"\!="                    { return T\_NEQ; }
-"\<"                     { return T\_LT; }
-"\>"                     { return T\_GT; }
-"\<="                    { return T\_LTE; }
-"\>="                    { return T\_GTE; }
+"=="               { return T_EQ; }
+"!="               { return T_NEQ; }
+"<="               { return T_LTE; }
+">="               { return T_GTE; }
+"<"                { return T_LT; }
+">"                { return T_GT; }
 
-"("                     { return T\_LPAREN; }
-")"                     { return T\_RPAREN; }
-"{"                     { return T\_LBRACE; }
-"}"                     { return T\_RBRACE; }
-";"                     { return T\_SEMICOLON; }
+"("                { return T_LPAREN; }
+")"                { return T_RPAREN; }
+"{"                { return T_LBRACE; }
+"}"                { return T_RBRACE; }
+";"                { return T_SEMICOLON; }
 
-{DIGIT}+.{DIGIT}+      { yylval.fval = atof(yytext); return T\_FLOAT\_LITERAL; }
-{DIGIT}+                { yylval.ival = atoi(yytext); return T\_INTEGER\_LITERAL; }
+{DIGIT}+"."{DIGIT}+ {
+                     yylval.fval = atof(yytext);
+                     return T_FLOAT_LITERAL;
+                   }
+{DIGIT}+           {
+                     yylval.ival = atoi(yytext);
+                     return T_INTEGER_LITERAL;
+                   }
 
-{ID}                    { yylval.sval = copy\_yytext(); return T\_IDENTIFIER; }
+{ID}               {
+                     yylval.sval = copy_yytext();
+                     return T_IDENTIFIER;
+                   }
 
-"                             { /\* Inicio de string literal \*/
-int c;
-char buf[1024]; // Buffer para el contenido del string
-int i = 0;
-while ((c = input()) \!= '"' && c \!= EOF && c \!= '\\n') {
-if (i \< 1023) { // Deja espacio para el terminador nulo
-buf[i++] = c;
-} else {
-yyerror("String literal demasiado largo, excede el buffer interno");
-while ((c = input()) \!= '"' && c \!= EOF && c \!= '\\n'); // Consumir el resto
-return T\_ERROR; // Retornar token de error (debe estar definido en parser.y)
-}
-}
-buf[i] = '\\0'; // Terminar el string
-if (c == '"') {
-yylval.sval = strdup(buf);
-if (yylval.sval == NULL) {
-yyerror("Error de memoria duplicando string literal");
-return T\_ERROR;
-}
-} else {
-yyerror("String literal no terminado");
-return T\_ERROR;
-}
-return T\_STRING\_LITERAL;
-}
+\"([^\"\n])*\"     {
+                     /* extrae sin las comillas */
+                     char *s = (char*)malloc(yyleng - 1);
+                     if (!s) {
+                         yyerror("Error de memoria en literal de cadena");
+                         return T_ERROR;
+                     }
+                     strncpy(s, yytext + 1, yyleng - 2);
+                     s[yyleng - 2] = '\0';
+                     yylval.sval = s;
+                     return T_STRING_LITERAL;
+                   }
 
-.                       { /\* Caracter inválido \*/
-char msg[256];
-snprintf(msg, sizeof(msg), "Caracter inesperado: '%.\*s'", yyleng \> 200 ? 200 : yyleng, yytext);
-yyerror(msg);
-// Considera retornar un token T\_ERROR si lo tienes definido en parser.y
-// para permitir que el parser intente recuperarse.
-// return T\_ERROR;
-}
+.                  {
+                     char msg[256];
+                     snprintf(msg, sizeof(msg),
+                              "Caracter inesperado: '%.*s'",
+                              yyleng > 200 ? 200 : yyleng,
+                              yytext);
+                     yyerror(msg);
+                     /* opcional: return T_ERROR; */
+                   }
 
 %%
-
-// La función copy\_yytext() ya está definida en la sección %{ %} de arriba.
-// No se necesita yywrap() si se usa %option noyywrap.
-// No se necesita main() aquí, ya que el tuyo está en main.cpp.
