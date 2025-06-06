@@ -134,6 +134,57 @@ while (x > 0) {
 
 ---
 
+## Ejemplos adicionales
+
+### 1. Operaciones y tipos
+```c
+int a = 2;
+float b = 3.5;
+string mensaje = "Resultado:";
+
+b = b + a;
+print(mensaje);
+print(b);
+```
+
+### 2. If anidado y errores comunes
+```c
+int edad;
+print("Ingresa tu edad:");
+read(edad);
+
+if (edad >= 18) {
+    print("Eres mayor de edad");
+    if (edad > 65) {
+        print("Eres adulto mayor");
+    }
+} else {
+    print("Eres menor de edad");
+}
+```
+
+### 3. Error semántico: uso de variable no declarada
+```c
+x = 10; // Error: x no está declarada
+```
+
+### 4. Error semántico: tipos incompatibles
+```c
+int n;
+n = "texto"; // Error: asignación de cadena a entero
+```
+
+### 5. Bucle y operaciones
+```c
+int i = 0;
+while (i < 5) {
+    print(i);
+    i = i + 1;
+}
+```
+
+---
+
 ## Notas
 - El compilador detecta errores léxicos, sintácticos y semánticos (variables no declaradas, tipos incompatibles, etc.).
 - El código generado es C estándar y puede ser compilado con GCC.

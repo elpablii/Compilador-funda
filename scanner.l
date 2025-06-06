@@ -9,10 +9,10 @@
 extern void yyerror(const char *mensaje);
 
 /* Función auxiliar para copiar el texto actual de yytext */
-char *copiarTexto() {
+char *copiarTextoActual() {
     char *cadena = (char *) malloc(yyleng + 1);
     if (!cadena) {
-        yyerror("Error de memoria en copiarTexto");
+        yyerror("Error de memoria en copiarTextoActual");
         exit(EXIT_FAILURE);
     }
     strncpy(cadena, yytext, yyleng);
@@ -76,7 +76,7 @@ NUEVALINEA     \n
 }
 
 {IDENTIFICADOR}      {
-    yylval.sval = copiarTexto();
+    yylval.sval = copiarTextoActual();
     return T_IDENTIFIER;
 }
 

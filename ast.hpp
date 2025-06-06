@@ -9,340 +9,340 @@
 #include <iostream> // Para std::ostream
 
 // Enumeración para los tipos de nodos del AST
-enum class NodeType {
-    PROGRAM,
-    STATEMENT_LIST,
-    VARIABLE_DECLARATION,
-    ASSIGNMENT,
-    IF_STATEMENT,
-    WHILE_STATEMENT,
-    PRINT_STATEMENT,
-    READ_STATEMENT,       // Lectura (placeholder: requiere más infraestructura)
-    BINARY_OPERATION,
-    UNARY_OPERATION,      // Por ejemplo, -num
-    NUMBER_LITERAL,
-    FLOAT_LITERAL,
-    STRING_LITERAL,
-    IDENTIFIER
+enum class TipoNodo {
+    PROGRAMA,
+    LISTA_SENTENCIAS,
+    DECLARACION_VARIABLE,
+    ASIGNACION,
+    SI,
+    MIENTRAS,
+    IMPRIMIR,
+    LEER,
+    OPERACION_BINARIA,
+    OPERACION_UNARIA,
+    LITERAL_ENTERO,
+    LITERAL_FLOTANTE,
+    LITERAL_CADENA,
+    IDENTIFICADOR
 };
 
 // Enumeración para los tipos de datos del lenguaje
-enum class DataType {
-    INT,
-    FLOAT,
-    STRING,
-    VOID                  // Para funciones o sentencias sin valor de retorno
+enum class TipoDato {
+    ENTERO,
+    FLOTANTE,
+    CADENA,
+    VACIO
 };
 
 // Clase base para todos los nodos del AST
-struct Node {
-    NodeType type;
+struct Nodo {
+    TipoNodo tipo;
 
-    explicit Node(NodeType t)
-        : type(t)
+    explicit Nodo(TipoNodo t)
+        : tipo(t)
     {}
 
-    virtual ~Node() = default;
+    virtual ~Nodo() = default;
 
     // Método virtual para imprimir el AST (útil en depuración)
-    virtual void print(std::ostream& os, int indent = 0) const {
+    virtual void imprimir(std::ostream& os, int indent = 0) const {
         os << std::string(indent, ' ') << "Nodo (desconocido)\n";
     }
 
     // Método virtual para generar código (por defecto no hace nada)
-    virtual void generateCode(std::ostream& os) const {}
+    virtual void generarCodigo(std::ostream& os) const {}
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para una lista de sentencias
 // ----------------------------------------------------------------------------
-struct StatementListNode : public Node {
-    std::vector<Node*> statements;
+struct ListaSentenciasNode : public Nodo {
+    std::vector<Nodo*> sentencias;
 
-    StatementListNode()
-        : Node(NodeType::STATEMENT_LIST)
+    ListaSentenciasNode()
+        : Nodo(TipoNodo::LISTA_SENTENCIAS)
     {}
 
-    ~StatementListNode() override {
-        for (Node* stmt : statements) {
+    ~ListaSentenciasNode() override {
+        for (Nodo* stmt : sentencias) {
             if (stmt) {
                 delete stmt;
             }
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo raíz del programa
 // ----------------------------------------------------------------------------
-struct ProgramNode : public Node {
-    StatementListNode* statementList;
+struct ProgramaNode : public Nodo {
+    ListaSentenciasNode* listaSentencias;
 
-    explicit ProgramNode(StatementListNode* sl)
-        : Node(NodeType::PROGRAM),
-          statementList(sl)
+    explicit ProgramaNode(ListaSentenciasNode* sl)
+        : Nodo(TipoNodo::PROGRAMA),
+          listaSentencias(sl)
     {}
 
-    ~ProgramNode() override {
-        if (statementList) {
-            delete statementList;
+    ~ProgramaNode() override {
+        if (listaSentencias) {
+            delete listaSentencias;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para literales numéricos (enteros)
 // ----------------------------------------------------------------------------
-struct NumberLiteralNode : public Node {
-    int value;
+struct LiteralEnteroNode : public Nodo {
+    int valor;
 
-    explicit NumberLiteralNode(int val)
-        : Node(NodeType::NUMBER_LITERAL),
-          value(val)
+    explicit LiteralEnteroNode(int val)
+        : Nodo(TipoNodo::LITERAL_ENTERO),
+          valor(val)
     {}
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para literales de punto flotante
 // ----------------------------------------------------------------------------
-struct FloatLiteralNode : public Node {
-    float value;
+struct LiteralFlotanteNode : public Nodo {
+    float valor;
 
-    explicit FloatLiteralNode(float val)
-        : Node(NodeType::FLOAT_LITERAL),
-          value(val)
+    explicit LiteralFlotanteNode(float val)
+        : Nodo(TipoNodo::LITERAL_FLOTANTE),
+          valor(val)
     {}
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para literales de cadena
 // ----------------------------------------------------------------------------
-struct StringLiteralNode : public Node {
-    std::string value;
+struct LiteralCadenaNode : public Nodo {
+    std::string valor;
 
-    explicit StringLiteralNode(const std::string& val)
-        : Node(NodeType::STRING_LITERAL),
-          value(val)
+    explicit LiteralCadenaNode(const std::string& val)
+        : Nodo(TipoNodo::LITERAL_CADENA),
+          valor(val)
     {}
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para identificadores (nombres de variables)
 // ----------------------------------------------------------------------------
-struct IdentifierNode : public Node {
-    std::string name;
+struct IdentificadorNode : public Nodo {
+    std::string nombre;
 
-    explicit IdentifierNode(const std::string& n)
-        : Node(NodeType::IDENTIFIER),
-          name(n)
+    explicit IdentificadorNode(const std::string& n)
+        : Nodo(TipoNodo::IDENTIFICADOR),
+          nombre(n)
     {}
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para operaciones binarias (p. ej. a + b, c > d)
 // ----------------------------------------------------------------------------
-struct BinaryOperationNode : public Node {
-    std::string op; // Operador como cadena (p. ej. "+", "==")
-    Node* left;
-    Node* right;
+struct OperacionBinariaNode : public Nodo {
+    std::string operador; // Operador como cadena (p. ej. "+", "==")
+    Nodo* izquierda;
+    Nodo* derecha;
 
-    BinaryOperationNode(const std::string& oper, Node* l, Node* r)
-        : Node(NodeType::BINARY_OPERATION),
-          op(oper),
-          left(l),
-          right(r)
+    OperacionBinariaNode(const std::string& oper, Nodo* l, Nodo* r)
+        : Nodo(TipoNodo::OPERACION_BINARIA),
+          operador(oper),
+          izquierda(l),
+          derecha(r)
     {}
 
-    ~BinaryOperationNode() override {
-        if (left) {
-            delete left;
+    ~OperacionBinariaNode() override {
+        if (izquierda) {
+            delete izquierda;
         }
-        if (right) {
-            delete right;
+        if (derecha) {
+            delete derecha;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para declaración de variables
 // ----------------------------------------------------------------------------
-struct VariableDeclarationNode : public Node {
-    DataType varType;
-    IdentifierNode* identifier;
-    Node* initialization; // Expresión opcional de inicialización
+struct DeclaracionVariableNode : public Nodo {
+    TipoDato tipoVariable;
+    IdentificadorNode* identificador;
+    Nodo* inicializacion; // Expresión opcional de inicialización
 
-    VariableDeclarationNode(DataType vt, IdentifierNode* id, Node* init = nullptr)
-        : Node(NodeType::VARIABLE_DECLARATION),
-          varType(vt),
-          identifier(id),
-          initialization(init)
+    DeclaracionVariableNode(TipoDato vt, IdentificadorNode* id, Nodo* init = nullptr)
+        : Nodo(TipoNodo::DECLARACION_VARIABLE),
+          tipoVariable(vt),
+          identificador(id),
+          inicializacion(init)
     {}
 
-    ~VariableDeclarationNode() override {
-        if (identifier) {
-            delete identifier;
+    ~DeclaracionVariableNode() override {
+        if (identificador) {
+            delete identificador;
         }
-        if (initialization) {
-            delete initialization;
+        if (inicializacion) {
+            delete inicializacion;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para asignaciones (p. ej. x = 10)
 // ----------------------------------------------------------------------------
-struct AssignmentNode : public Node {
-    IdentifierNode* identifier;
-    Node* expression;
+struct AsignacionNode : public Nodo {
+    IdentificadorNode* identificador;
+    Nodo* expresion;
 
-    AssignmentNode(IdentifierNode* id, Node* expr)
-        : Node(NodeType::ASSIGNMENT),
-          identifier(id),
-          expression(expr)
+    AsignacionNode(IdentificadorNode* id, Nodo* expr)
+        : Nodo(TipoNodo::ASIGNACION),
+          identificador(id),
+          expresion(expr)
     {}
 
-    ~AssignmentNode() override {
-        if (identifier) {
-            delete identifier;
+    ~AsignacionNode() override {
+        if (identificador) {
+            delete identificador;
         }
-        if (expression) {
-            delete expression;
+        if (expresion) {
+            delete expresion;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para sentencias if-else
 // ----------------------------------------------------------------------------
-struct IfStatementNode : public Node {
-    Node* condition;
-    StatementListNode* thenBranch;
-    StatementListNode* elseBranch; // Puede ser nullptr si no hay else
+struct SiNode : public Nodo {
+    Nodo* condicion;
+    ListaSentenciasNode* entonces;
+    ListaSentenciasNode* sino; // Puede ser nullptr si no hay else
 
-    IfStatementNode(Node* cond, StatementListNode* thenB, StatementListNode* elseB = nullptr)
-        : Node(NodeType::IF_STATEMENT),
-          condition(cond),
-          thenBranch(thenB),
-          elseBranch(elseB)
+    SiNode(Nodo* cond, ListaSentenciasNode* thenB, ListaSentenciasNode* elseB = nullptr)
+        : Nodo(TipoNodo::SI),
+          condicion(cond),
+          entonces(thenB),
+          sino(elseB)
     {}
 
-    ~IfStatementNode() override {
-        if (condition) {
-            delete condition;
+    ~SiNode() override {
+        if (condicion) {
+            delete condicion;
         }
-        if (thenBranch) {
-            delete thenBranch;
+        if (entonces) {
+            delete entonces;
         }
-        if (elseBranch) {
-            delete elseBranch;
+        if (sino) {
+            delete sino;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para sentencias while
 // ----------------------------------------------------------------------------
-struct WhileStatementNode : public Node {
-    Node* condition;
-    StatementListNode* body;
+struct MientrasNode : public Nodo {
+    Nodo* condicion;
+    ListaSentenciasNode* cuerpo;
 
-    WhileStatementNode(Node* cond, StatementListNode* b)
-        : Node(NodeType::WHILE_STATEMENT),
-          condition(cond),
-          body(b)
+    MientrasNode(Nodo* cond, ListaSentenciasNode* b)
+        : Nodo(TipoNodo::MIENTRAS),
+          condicion(cond),
+          cuerpo(b)
     {}
 
-    ~WhileStatementNode() override {
-        if (condition) {
-            delete condition;
+    ~MientrasNode() override {
+        if (condicion) {
+            delete condicion;
         }
-        if (body) {
-            delete body;
+        if (cuerpo) {
+            delete cuerpo;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para la sentencia print
 // ----------------------------------------------------------------------------
-struct PrintStatementNode : public Node {
-    Node* expression;
+struct ImprimirNode : public Nodo {
+    Nodo* expresion;
 
-    explicit PrintStatementNode(Node* expr)
-        : Node(NodeType::PRINT_STATEMENT),
-          expression(expr)
+    explicit ImprimirNode(Nodo* expr)
+        : Nodo(TipoNodo::IMPRIMIR),
+          expresion(expr)
     {}
 
-    ~PrintStatementNode() override {
-        if (expression) {
-            delete expression;
+    ~ImprimirNode() override {
+        if (expresion) {
+            delete expresion;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Nodo para la sentencia read (placeholder)
 // ----------------------------------------------------------------------------
-struct ReadStatementNode : public Node {
-    IdentifierNode* identifier;
+struct LeerNode : public Nodo {
+    IdentificadorNode* identificador;
 
-    explicit ReadStatementNode(IdentifierNode* id)
-        : Node(NodeType::READ_STATEMENT),
-          identifier(id)
+    explicit LeerNode(IdentificadorNode* id)
+        : Nodo(TipoNodo::LEER),
+          identificador(id)
     {}
 
-    ~ReadStatementNode() override {
-        if (identifier) {
-            delete identifier;
+    ~LeerNode() override {
+        if (identificador) {
+            delete identificador;
         }
     }
 
-    void print(std::ostream& os, int indent = 0) const override;
-    void generateCode(std::ostream& os) const override;
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
 };
 
 // ----------------------------------------------------------------------------
 // Prototipo para imprimir el AST completo
 // ----------------------------------------------------------------------------
-void printAST(const Node* root, std::ostream& os);
+void imprimirAST(const Nodo* raiz, std::ostream& os);
 
 // Prototipo para generar código desde el AST completo
-void generateCodeFromAST(const Node* root, std::ostream& os);
+void generarCodigoDesdeAST(const Nodo* raiz, std::ostream& os);
 
 #endif // AST_HPP

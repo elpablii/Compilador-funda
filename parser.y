@@ -1,5 +1,5 @@
 %{
-// parser.y (skeleton en C++ para Bison)
+// parser.y (skeleton en C++ para Bison, refactorizado a español)
 
 #include <cstdio>
 #include <cstdlib>
@@ -11,7 +11,7 @@
 extern int yylex();
 extern int yylineno;
 extern char *yytext;
-extern FILE *yyin;
+extern FILE *entradaAnalizador;
 
 // Función de error (se llama en errores sintácticos)
 void yyerror(const char *mensaje);
@@ -23,15 +23,15 @@ void yyerror(const char *mensaje);
 }
 
 %union {
-    Node*                     node;
-    StatementListNode*        stmt_list_node;
-    IdentifierNode*           id_node;
-    VariableDeclarationNode*  var_decl_node;
-    AssignmentNode*           assign_node;
-    IfStatementNode*          if_node;
-    WhileStatementNode*       while_node;
-    PrintStatementNode*       print_node;
-    ReadStatementNode*        read_node;
+    Node*                     nodo;
+    ListaSentenciasNode*      listaSentenciasNodo;
+    IdentificadorNode*        identificadorNodo;
+    DeclaracionVariableNode*  declaracionVariableNodo;
+    AsignacionNode*           asignacionNodo;
+    SiStatementNode*          siNodo;
+    MientrasStatementNode*    mientrasNodo;
+    ImprimirStatementNode*    imprimirNodo;
+    LeerStatementNode*        leerNodo;
 
     char*   sval;
     int     ival;
@@ -54,16 +54,16 @@ void yyerror(const char *mensaje);
 %token T_ERROR
 
 /* Tipos para no-terminales */
-%type <node> program statement expression arithmetic_expression term factor primary_expression comparison_expression
-%type <stmt_list_node> statement_list block
-%type <id_node> identifier
-%type <var_decl_node> variable_declaration
-%type <assign_node> assignment_statement
-%type <if_node> if_statement
-%type <while_node> while_statement
-%type <print_node> print_statement
-%type <read_node> read_statement
-%type <dtype> type_specifier
+%type <nodo> programa sentencia expresion expresionAritmetica termino factor expresionComparacion expresionPrimaria
+%type <listaSentenciasNodo> sentenciaLista bloque
+%type <identificadorNodo> identificador
+%type <declaracionVariableNodo> declaracionVariable
+%type <asignacionNodo> asignacionSentencia
+%type <siNodo> siSentencia
+%type <mientrasNodo> mientrasSentencia
+%type <imprimirNodo> imprimirSentencia
+%type <leerNodo> leerSentencia
+%type <dtype> especificadorTipo
 
 /* Precedencia de operadores */
 %left T_EQ T_NEQ
@@ -79,53 +79,53 @@ void yyerror(const char *mensaje);
 
 %%
 
-program:
-    statement_list
+programa:
+    sentenciaLista
     {
-        ast_root = new ProgramNode($1);
+        ast_root = new ProgramaNode($1);
     }
 ;
 
-statement_list:
+sentenciaLista:
       /* vacío */
     {
-        $$ = new StatementListNode();
+        $$ = new ListaSentenciasNode();
     }
-  | statement_list statement
+  | sentenciaLista sentencia
     {
         if ($2) {
-            $1->statements.push_back($2);
+            $1->sentencias.push_back($2);
         }
         $$ = $1;
     }
 ;
 
-statement:
-      variable_declaration
+sentencia:
+      declaracionVariable
     {
         $$ = $1;
     }
-  | assignment_statement
+  | asignacionSentencia
     {
         $$ = $1;
     }
-  | if_statement
+  | siSentencia
     {
         $$ = $1;
     }
-  | while_statement
+  | mientrasSentencia
     {
         $$ = $1;
     }
-  | print_statement
+  | imprimirSentencia
     {
         $$ = $1;
     }
-  | read_statement
+  | leerSentencia
     {
         $$ = $1;
     }
-  | block
+  | bloque
     {
         $$ = $1;
     }
@@ -140,15 +140,15 @@ statement:
     }
 ;
 
-block:
-    T_LBRACE statement_list T_RBRACE
+bloque:
+    T_LBRACE sentenciaLista T_RBRACE
     {
         $$ = $2;
     }
 ;
 
 /* Especificador de tipos */
-type_specifier:
+especificadorTipo:
       T_INT
     {
         $$ = DataType::INT;
@@ -163,133 +163,133 @@ type_specifier:
     }
 ;
 
-variable_declaration:
-      type_specifier identifier T_SEMICOLON
+declaracionVariable:
+      especificadorTipo identificador T_SEMICOLON
     {
-        $$ = new VariableDeclarationNode($1, $2, nullptr);
+        $$ = new DeclaracionVariableNode($1, $2, nullptr);
     }
-  | type_specifier identifier T_ASSIGN expression T_SEMICOLON
+  | especificadorTipo identificador T_ASSIGN expresion T_SEMICOLON
     {
-        $$ = new VariableDeclarationNode($1, $2, $4);
-    }
-;
-
-assignment_statement:
-    identifier T_ASSIGN expression T_SEMICOLON
-    {
-        $$ = new AssignmentNode($1, $3);
+        $$ = new DeclaracionVariableNode($1, $2, $4);
     }
 ;
 
-if_statement:
-      T_IF T_LPAREN expression T_RPAREN block
+asignacionSentencia:
+    identificador T_ASSIGN expresion T_SEMICOLON
     {
-        $$ = new IfStatementNode($3, $5, nullptr);
-    }
-  | T_IF T_LPAREN expression T_RPAREN block T_ELSE block
-    {
-        $$ = new IfStatementNode($3, $5, $7);
+        $$ = new AsignacionNode($1, $3);
     }
 ;
 
-while_statement:
-    T_WHILE T_LPAREN expression T_RPAREN block
+siSentencia:
+      T_IF T_LPAREN expresion T_RPAREN bloque
     {
-        $$ = new WhileStatementNode($3, $5);
+        $$ = new SiStatementNode($3, $5, nullptr);
+    }
+  | T_IF T_LPAREN expresion T_RPAREN bloque T_ELSE bloque
+    {
+        $$ = new SiStatementNode($3, $5, $7);
     }
 ;
 
-print_statement:
-    T_PRINT T_LPAREN expression T_RPAREN T_SEMICOLON
+mientrasSentencia:
+    T_WHILE T_LPAREN expresion T_RPAREN bloque
     {
-        $$ = new PrintStatementNode($3);
+        $$ = new MientrasStatementNode($3, $5);
     }
 ;
 
-read_statement:
-    T_READ T_LPAREN identifier T_RPAREN T_SEMICOLON
+imprimirSentencia:
+    T_PRINT T_LPAREN expresion T_RPAREN T_SEMICOLON
     {
-        $$ = new ReadStatementNode($3);
+        $$ = new ImprimirStatementNode($3);
     }
 ;
 
-expression:
-    comparison_expression
+leerSentencia:
+    T_READ T_LPAREN identificador T_RPAREN T_SEMICOLON
+    {
+        $$ = new LeerStatementNode($3);
+    }
+;
+
+expresion:
+    expresionComparacion
     {
         $$ = $1;
     }
 ;
 
-comparison_expression:
-      arithmetic_expression
+expresionComparacion:
+      expresionAritmetica
     {
         $$ = $1;
     }
-  | arithmetic_expression T_EQ arithmetic_expression
+  | expresionAritmetica T_EQ expresionAritmetica
     {
         $$ = new BinaryOperationNode("==", $1, $3);
     }
-  | arithmetic_expression T_NEQ arithmetic_expression
+  | expresionAritmetica T_NEQ expresionAritmetica
     {
         $$ = new BinaryOperationNode("!=", $1, $3);
     }
-  | arithmetic_expression T_LT arithmetic_expression
+  | expresionAritmetica T_LT expresionAritmetica
     {
         $$ = new BinaryOperationNode("<", $1, $3);
     }
-  | arithmetic_expression T_GT arithmetic_expression
+  | expresionAritmetica T_GT expresionAritmetica
     {
         $$ = new BinaryOperationNode(">", $1, $3);
     }
-  | arithmetic_expression T_LTE arithmetic_expression
+  | expresionAritmetica T_LTE expresionAritmetica
     {
         $$ = new BinaryOperationNode("<=", $1, $3);
     }
-  | arithmetic_expression T_GTE arithmetic_expression
+  | expresionAritmetica T_GTE expresionAritmetica
     {
         $$ = new BinaryOperationNode(">=", $1, $3);
     }
 ;
 
-arithmetic_expression:
-      term
+expresionAritmetica:
+      termino
     {
         $$ = $1;
     }
-  | arithmetic_expression T_PLUS term
+  | expresionAritmetica T_PLUS termino
     {
         $$ = new BinaryOperationNode("+", $1, $3);
     }
-  | arithmetic_expression T_MINUS term
+  | expresionAritmetica T_MINUS termino
     {
         $$ = new BinaryOperationNode("-", $1, $3);
     }
 ;
 
-term:
+termino:
       factor
     {
         $$ = $1;
     }
-  | term T_MULTIPLY factor
+  | termino T_MULTIPLY factor
     {
         $$ = new BinaryOperationNode("*", $1, $3);
     }
-  | term T_DIVIDE factor
+  | termino T_DIVIDE factor
     {
         $$ = new BinaryOperationNode("/", $1, $3);
     }
 ;
 
 factor:
-    primary_expression
+    expresionPrimaria
     {
         $$ = $1;
     }
 ;
 
-primary_expression:
-      identifier
+expresionPrimaria:
+      identificador
     {
         $$ = $1;
     }
@@ -307,18 +307,18 @@ primary_expression:
         free($1);
         $$ = new StringLiteralNode(cad);
     }
-  | T_LPAREN expression T_RPAREN
+  | T_LPAREN expresion T_RPAREN
     {
         $$ = $2;
     }
 ;
 
-identifier:
+identificador:
     T_IDENTIFIER
     {
         std::string nombre($1);
         free($1);
-        $$ = new IdentifierNode(nombre);
+        $$ = new IdentificadorNode(nombre);
     }
 ;
 

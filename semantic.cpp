@@ -2,111 +2,116 @@
 #include <iostream>
 #include <typeinfo>
 
-struct SymbolInfo {
-    DataType tipo;
+// Estructura para la información de cada símbolo en la tabla
+struct InfoSimbolo {
+    TipoDato tipo;
     bool inicializada;
 };
 
-using TablaSimbolos = std::unordered_map<std::string, SymbolInfo>;
+using TablaSimbolos = std::unordered_map<std::string, InfoSimbolo>;
 
-static void recorrerAST(Node* node, TablaSimbolos& tabla, std::vector<SemanticError>& errores);
+// Prototipos internos
+static void recorrerAST(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSemantico>& errores);
+static TipoDato obtenerTipo(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSemantico>& errores);
 
-static DataType obtenerTipo(Node* node, TablaSimbolos& tabla, std::vector<SemanticError>& errores) {
-    if (!node) return DataType::VOID;
-    switch (node->type) {
-        case NodeType::NUMBER_LITERAL: return DataType::INT;
-        case NodeType::FLOAT_LITERAL:  return DataType::FLOAT;
-        case NodeType::STRING_LITERAL: return DataType::STRING;
-        case NodeType::IDENTIFIER: {
-            auto* id = static_cast<IdentifierNode*>(node);
-            auto it = tabla.find(id->name);
+// Determina el tipo de un nodo de expresión
+static TipoDato obtenerTipo(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSemantico>& errores) {
+    if (!nodo) return TipoDato::VACIO;
+    switch (nodo->tipo) {
+        case TipoNodo::LITERAL_ENTERO:   return TipoDato::ENTERO;
+        case TipoNodo::LITERAL_FLOTANTE: return TipoDato::FLOTANTE;
+        case TipoNodo::LITERAL_CADENA:   return TipoDato::CADENA;
+        case TipoNodo::IDENTIFICADOR: {
+            auto* id = static_cast<IdentificadorNode*>(nodo);
+            auto it = tabla.find(id->nombre);
             if (it == tabla.end()) {
-                errores.push_back({"Variable no declarada: " + id->name, 0});
-                return DataType::VOID;
+                errores.push_back({"Variable no declarada: " + id->nombre, 0});
+                return TipoDato::VACIO;
             }
             return it->second.tipo;
         }
-        case NodeType::BINARY_OPERATION: {
-            auto* bin = static_cast<BinaryOperationNode*>(node);
-            DataType izq = obtenerTipo(bin->left, tabla, errores);
-            DataType der = obtenerTipo(bin->right, tabla, errores);
+        case TipoNodo::OPERACION_BINARIA: {
+            auto* bin = static_cast<OperacionBinariaNode*>(nodo);
+            TipoDato izq = obtenerTipo(bin->izquierda, tabla, errores);
+            TipoDato der = obtenerTipo(bin->derecha, tabla, errores);
             if (izq == der) return izq;
-            if ((izq == DataType::INT && der == DataType::FLOAT) ||
-                (izq == DataType::FLOAT && der == DataType::INT))
-                return DataType::FLOAT;
+            if ((izq == TipoDato::ENTERO && der == TipoDato::FLOTANTE) ||
+                (izq == TipoDato::FLOTANTE && der == TipoDato::ENTERO))
+                return TipoDato::FLOTANTE;
             errores.push_back({"Operación entre tipos incompatibles", 0});
-            return DataType::VOID;
+            return TipoDato::VACIO;
         }
-        default: return DataType::VOID;
+        default: return TipoDato::VACIO;
     }
 }
 
-static void recorrerAST(Node* node, TablaSimbolos& tabla, std::vector<SemanticError>& errores) {
-    if (!node) return;
-    switch (node->type) {
-        case NodeType::PROGRAM: {
-            auto* prog = static_cast<ProgramNode*>(node);
-            recorrerAST(prog->statementList, tabla, errores);
+// Recorre el AST y verifica reglas semánticas
+static void recorrerAST(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSemantico>& errores) {
+    if (!nodo) return;
+    switch (nodo->tipo) {
+        case TipoNodo::PROGRAMA: {
+            auto* prog = static_cast<ProgramaNode*>(nodo);
+            recorrerAST(prog->listaSentencias, tabla, errores);
             break;
         }
-        case NodeType::STATEMENT_LIST: {
-            auto* list = static_cast<StatementListNode*>(node);
-            for (auto* stmt : list->statements)
-                recorrerAST(stmt, tabla, errores);
+        case TipoNodo::LISTA_SENTENCIAS: {
+            auto* lista = static_cast<ListaSentenciasNode*>(nodo);
+            for (auto* sentencia : lista->sentencias)
+                recorrerAST(sentencia, tabla, errores);
             break;
         }
-        case NodeType::VARIABLE_DECLARATION: {
-            auto* decl = static_cast<VariableDeclarationNode*>(node);
-            std::string nombre = decl->identifier->name;
+        case TipoNodo::DECLARACION_VARIABLE: {
+            auto* decl = static_cast<DeclaracionVariableNode*>(nodo);
+            std::string nombre = decl->identificador->nombre;
             if (tabla.count(nombre)) {
                 errores.push_back({"Variable redeclarada: " + nombre, 0});
             } else {
-                tabla[nombre] = {decl->varType, decl->initialization != nullptr};
+                tabla[nombre] = {decl->tipoVariable, decl->inicializacion != nullptr};
             }
-            if (decl->initialization) {
-                DataType tipoInit = obtenerTipo(decl->initialization, tabla, errores);
-                if (tipoInit != decl->varType && tipoInit != DataType::VOID) {
+            if (decl->inicializacion) {
+                TipoDato tipoInit = obtenerTipo(decl->inicializacion, tabla, errores);
+                if (tipoInit != decl->tipoVariable && tipoInit != TipoDato::VACIO) {
                     errores.push_back({"Inicialización de tipo incompatible para variable: " + nombre, 0});
                 }
             }
             break;
         }
-        case NodeType::ASSIGNMENT: {
-            auto* asig = static_cast<AssignmentNode*>(node);
-            std::string nombre = asig->identifier->name;
+        case TipoNodo::ASIGNACION: {
+            auto* asig = static_cast<AsignacionNode*>(nodo);
+            std::string nombre = asig->identificador->nombre;
             auto it = tabla.find(nombre);
             if (it == tabla.end()) {
                 errores.push_back({"Variable no declarada: " + nombre, 0});
             } else {
-                DataType tipoExpr = obtenerTipo(asig->expression, tabla, errores);
-                if (tipoExpr != it->second.tipo && tipoExpr != DataType::VOID) {
+                TipoDato tipoExpr = obtenerTipo(asig->expresion, tabla, errores);
+                if (tipoExpr != it->second.tipo && tipoExpr != TipoDato::VACIO) {
                     errores.push_back({"Asignación de tipo incompatible a variable: " + nombre, 0});
                 }
                 it->second.inicializada = true;
             }
             break;
         }
-        case NodeType::IF_STATEMENT: {
-            auto* ifs = static_cast<IfStatementNode*>(node);
-            recorrerAST(ifs->condition, tabla, errores);
-            recorrerAST(ifs->thenBranch, tabla, errores);
-            if (ifs->elseBranch) recorrerAST(ifs->elseBranch, tabla, errores);
+        case TipoNodo::SI: {
+            auto* si = static_cast<SiNode*>(nodo);
+            recorrerAST(si->condicion, tabla, errores);
+            recorrerAST(si->entonces, tabla, errores);
+            if (si->sino) recorrerAST(si->sino, tabla, errores);
             break;
         }
-        case NodeType::WHILE_STATEMENT: {
-            auto* wh = static_cast<WhileStatementNode*>(node);
-            recorrerAST(wh->condition, tabla, errores);
-            recorrerAST(wh->body, tabla, errores);
+        case TipoNodo::MIENTRAS: {
+            auto* mientras = static_cast<MientrasNode*>(nodo);
+            recorrerAST(mientras->condicion, tabla, errores);
+            recorrerAST(mientras->cuerpo, tabla, errores);
             break;
         }
-        case NodeType::PRINT_STATEMENT: {
-            auto* pr = static_cast<PrintStatementNode*>(node);
-            recorrerAST(pr->expression, tabla, errores);
+        case TipoNodo::IMPRIMIR: {
+            auto* imp = static_cast<ImprimirNode*>(nodo);
+            recorrerAST(imp->expresion, tabla, errores);
             break;
         }
-        case NodeType::READ_STATEMENT: {
-            auto* rd = static_cast<ReadStatementNode*>(node);
-            std::string nombre = rd->identifier->name;
+        case TipoNodo::LEER: {
+            auto* leer = static_cast<LeerNode*>(nodo);
+            std::string nombre = leer->identificador->nombre;
             if (!tabla.count(nombre)) {
                 errores.push_back({"Variable no declarada para leer: " + nombre, 0});
             }
@@ -116,8 +121,9 @@ static void recorrerAST(Node* node, TablaSimbolos& tabla, std::vector<SemanticEr
     }
 }
 
-bool analizarSemantica(Node* root, std::vector<SemanticError>& errores) {
+// Función principal de análisis semántico
+bool analizarSemantica(Nodo* raiz, std::vector<ErrorSemantico>& errores) {
     TablaSimbolos tabla;
-    recorrerAST(root, tabla, errores);
+    recorrerAST(raiz, tabla, errores);
     return errores.empty();
 }
