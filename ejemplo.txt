@@ -1,6 +1,6 @@
-int x;
-float y;
-string nombre;
+enteros x;
+flotantes y;
+texto nombre;
 
 x = 5;
 y = 2.5;

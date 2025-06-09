@@ -55,15 +55,15 @@ sudo apt install build-essential flex bison
 
 - **Declaración de variables:**
   ```c
-  int x;
-  float y;
-  string nombre;
+  enteros x;
+  flotantes y;
+  texto nombre;
   ```
 - **Inicialización:**
   ```c
-  int a = 5;
-  float b = 3.14;
-  string saludo = "Hola";
+  enteros a = 5;
+  flotantes b = 3.14;
+  texto saludo = "Hola";
   ```
 - **Asignación:**
   ```c
@@ -109,9 +109,9 @@ sudo apt install build-essential flex bison
 ## Ejemplo de programa
 
 ```c
-int x;
-float y;
-string nombre;
+enteros x;
+flotantes y;
+texto nombre;
 
 x = 5;
 y = 2.5;

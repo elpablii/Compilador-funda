@@ -37,33 +37,33 @@ NUEVALINEA     \n
 "//".*               { /* Ignorar comentario de línea */ }
 "/*"([^*]|\*+[^*/])*\*+"/"  { /* Ignorar comentario de bloque */ }
 
-"int"                { return T_INT; }
-"float"              { return T_FLOAT; }
-"string"             { return T_STRING_TYPE; }
-"if"                 { return T_IF; }
-"else"               { return T_ELSE; }
-"while"              { return T_WHILE; }
-"print"              { return T_PRINT; }
-"read"               { return T_READ; }
+"enteros"                { return T_INT; }
+"flotantes"              { return T_FLOAT; }
+"texto"                  { return T_STRING_TYPE; }
+"if"                     { return T_IF; }
+"else"                   { return T_ELSE; }
+"while"                  { return T_WHILE; }
+"print"                  { return T_PRINT; }
+"read"                   { return T_READ; }
 
-"="                  { return T_ASSIGN; }
-"+"                  { return T_PLUS; }
-"-"                  { return T_MINUS; }
-"*"                  { return T_MULTIPLY; }
-"/"                  { return T_DIVIDE; }
+"="                      { return T_ASSIGN; }
+"+"                      { return T_PLUS; }
+"-"                      { return T_MINUS; }
+"*"                      { return T_MULTIPLY; }
+"/"                      { return T_DIVIDE; }
 
-"=="                 { return T_EQ; }
-"!="                 { return T_NEQ; }
-"<="                 { return T_LTE; }
-">="                 { return T_GTE; }
-"<"                  { return T_LT; }
-">"                  { return T_GT; }
+"=="                     { return T_EQ; }
+"!="                     { return T_NEQ; }
+"<="                     { return T_LTE; }
+">="                     { return T_GTE; }
+"<"                      { return T_LT; }
+">"                      { return T_GT; }
 
-"("                  { return T_LPAREN; }
-")"                  { return T_RPAREN; }
-"{"                  { return T_LBRACE; }
-"}"                  { return T_RBRACE; }
-";"                  { return T_SEMICOLON; }
+"("                      { return T_LPAREN; }
+")"                      { return T_RPAREN; }
+"{"                      { return T_LBRACE; }
+"}"                      { return T_RBRACE; }
+";"                      { return T_SEMICOLON; }
 
 {DIGITO}+"."{DIGITO}+ {
     yylval.fval = atof(yytext);

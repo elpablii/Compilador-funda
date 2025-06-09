@@ -263,13 +263,13 @@ void PrintStatementNode::generateCode(std::ostream& os) const {
     os << "    printf(";
     if (expression) {
         if (expression->type == NodeType::STRING_LITERAL) {
-            os << "\"%s\", ";
+            os << "\"%s\\n\", ";
             expression->generateCode(os);
         } else if (expression->type == NodeType::FLOAT_LITERAL) {
-            os << "\"%f\", ";
+            os << "\"%f\\n\", ";
             expression->generateCode(os);
         } else {
-            os << "\"%d\", ";
+            os << "\"%d\\n\", ";
             expression->generateCode(os);
         }
     }
