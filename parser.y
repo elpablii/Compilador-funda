@@ -17,6 +17,9 @@
 // Bucle: mientras (x mayorcito 0) { ... }
 // Imprimir: imprima(x) fin
 // Leer: lease(x) fin
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 extern int yylex();
