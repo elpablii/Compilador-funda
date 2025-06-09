@@ -1,10 +1,23 @@
 //Bison
 
 %{
+<<<<<<< Updated upstream
 #include <iostream>
 #include <string>
 #include <map>
 #include <stdexcept>
+=======
+// parser.y (skeleton en C++ para Bison)
+// Ahora el lenguaje usa palabras clave personalizadas:
+// enterito, racional, textito, SI, entonces, mientras, imprima, lease
+// igual, suma, resta, por, dividido, equivalea, noequivalea, menoroigual, mayoroigual, mayorcito, menorcito, fin
+// Ejemplo de declaración: enterito x fin; racional y fin; textito nombre fin;
+// Ejemplo de uso: x igual 5 fin
+// Condicional: SI (x mayorcito 10) { ... } entonces { ... }
+// Bucle: mientras (x mayorcito 0) { ... }
+// Imprimir: imprima(x) fin
+// Leer: lease(x) fin
+>>>>>>> Stashed changes
 
 extern int yylex();
 void yyerror(const char *msg);

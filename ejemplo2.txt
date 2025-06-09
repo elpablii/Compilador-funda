@@ -1,0 +1,30 @@
+// Ejemplo alternativo con todas las funcionalidades
+enterito a fin
+racional b fin
+textito saludo fin
+
+a igual 5 fin
+b igual 2.5 fin
+saludo igual "Hola!" fin
+
+// Operaciones
+SI (a menorcito 10) {
+    imprima("a es menor que 10") fin
+} entonces {
+    imprima("a no es menor que 10") fin
+}
+
+SI (b equivalea 2.5) {
+    imprima("b es exactamente 2.5") fin
+}
+
+// Bucle descendente
+mientras (a mayorcito 0) {
+    imprima(a) fin
+    a igual a resta 1 fin
+}
+
+// Entrada y salida
+imprima("Escribe un nuevo saludo:") fin
+lease(saludo) fin
+imprima(saludo) fin 

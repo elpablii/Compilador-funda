@@ -1,0 +1,40 @@
+// Declaración de variables
+enterito numero fin
+racional raiz fin
+
+// Mensaje de inicio
+imprima("=== Analizador de Número ===\n") fin
+
+// Solicitar número al usuario
+imprima("Ingrese un número entero: ") fin
+lease(numero) fin
+
+// Mostrar el valor leído
+imprima("Valor ingresado: ") fin
+imprima(numero) fin
+imprima("\n") fin
+
+// Verificar si es positivo, negativo o cero
+SI (numero mayorcito 0) {
+    imprima("El número es positivo.\n") fin
+    // Calcular raíz cuadrada aproximada
+    raiz igual numero dividido 2.0 fin
+    enterito i fin
+    i igual 0 fin
+    mientras (i menoroigual 10) {
+        raiz igual (raiz suma (numero dividido raiz)) dividido 2.0 fin
+        i igual i suma 1 fin
+    }
+    imprima("Raíz cuadrada aproximada: ") fin
+    imprima(raiz) fin
+    imprima("\n") fin
+} entonces {
+    SI (numero equivalea 0) {
+        imprima("El número es cero.\n") fin
+    } entonces {
+        imprima("El número es negativo.\n") fin
+    }
+}
+
+// Mensaje de despedida
+imprima("Fin del análisis.\n") fin

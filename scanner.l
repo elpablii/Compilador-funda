@@ -14,9 +14,47 @@
 
 //Definiendo identificadores para los tipos de variables
 
+<<<<<<< Updated upstream
 [a-zA-Z_][a-zA-Z0-9_]* { 
     yylval.ide = new std::string(yytext);
     return ID; 
+=======
+"//".*               { /* Ignorar comentario de línea */ }
+"/*"([^*]|\*+[^*/])*\*+"/"  { /* Ignorar comentario de bloque */ }
+
+"enterito"           { return T_INT; }
+"racional"           { return T_FLOAT; }
+"textito"          { return T_STRING_TYPE; }
+"SI"                 { return T_IF; }
+"entonces"           { return T_ELSE; }
+"mientras"         { return T_WHILE; }
+"imprima"          { return T_PRINT; }
+"lease"            { return T_READ; }
+
+"igual"            { return T_ASSIGN; }
+"suma"             { return T_PLUS; }
+"resta"            { return T_MINUS; }
+"por"              { return T_MULTIPLY; }
+"dividido"         { return T_DIVIDE; }
+
+"equivalea"        { return T_EQ; }
+"noequivalea"      { return T_NEQ; }
+"menoroigual"      { return T_LTE; }
+"mayoroigual"      { return T_GTE; }
+"mayorcito"        { return T_GT; }
+"menorcito"        { return T_LT; }
+
+"fin"                { return T_SEMICOLON; }
+
+"("                  { return T_LPAREN; }
+")"                  { return T_RPAREN; }
+"{"                  { return T_LBRACE; }
+"}"                  { return T_RBRACE; }
+
+{DIGITO}+"."{DIGITO}+ {
+    yylval.fval = atof(yytext);
+    return T_FLOAT_LITERAL;
+>>>>>>> Stashed changes
 }
 
 //Palabras reservadas enteros
