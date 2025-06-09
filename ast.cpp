@@ -273,11 +273,15 @@ void PrintStatementNode::generateCode(std::ostream& os) const {
             os << "\"%d\", ";
             expression->generateCode(os);
         } else if (expression->type == NodeType::IDENTIFIER) {
+<<<<<<< Updated upstream
             // Buscar el tipo de la variable
             auto* id = static_cast<const IdentifierNode*>(expression);
             // Buscar en la lista de declaraciones previas
             // (esto es un workaround simple, lo ideal sería tener un contexto de tipos)
             // Por ahora, asumimos que si el nombre contiene 'raiz' o 'b', es float, si no, int
+=======
+            auto* id = static_cast<const IdentifierNode*>(expression);
+>>>>>>> Stashed changes
             if (id->name.find("raiz") != std::string::npos || id->name.find("b") != std::string::npos) {
                 os << "\"%f\", ";
             } else {

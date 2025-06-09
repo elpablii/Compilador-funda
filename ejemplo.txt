@@ -3,7 +3,11 @@ enterito numero fin
 racional raiz fin
 
 // Mensaje de inicio
+<<<<<<< Updated upstream
 imprima("=== Analizador de Número ===\n") fin
+=======
+imprima("=== Análisis de Número ===\n") fin
+>>>>>>> Stashed changes
 
 // Solicitar número al usuario
 imprima("Ingrese un número entero: ") fin
@@ -14,7 +18,11 @@ imprima("Valor ingresado: ") fin
 imprima(numero) fin
 imprima("\n") fin
 
+<<<<<<< Updated upstream
 // Verificar si es positivo, negativo o cero
+=======
+// Verificar y actuar según el valor
+>>>>>>> Stashed changes
 SI (numero mayorcito 0) {
     imprima("El número es positivo.\n") fin
     // Calcular raíz cuadrada aproximada
@@ -30,9 +38,15 @@ SI (numero mayorcito 0) {
     imprima("\n") fin
 } entonces {
     SI (numero equivalea 0) {
+<<<<<<< Updated upstream
         imprima("El número es cero.\n") fin
     } entonces {
         imprima("El número es negativo.\n") fin
+=======
+        imprima("El número es cero. No se puede calcular la raíz cuadrada.\n") fin
+    } entonces {
+        imprima("El número es negativo. No se puede calcular la raíz cuadrada.\n") fin
+>>>>>>> Stashed changes
     }
 }
 

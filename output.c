@@ -3,7 +3,11 @@
 int main() {
     int numero;
     float raiz;
+<<<<<<< Updated upstream
     printf("%s", "=== Analizador de Número ===\n");
+=======
+    printf("%s", "=== Análisis de Número ===\n");
+>>>>>>> Stashed changes
     printf("%s", "Ingrese un número entero: ");
     scanf("%d", &numero);
     printf("%s", "Valor ingresado: ");
@@ -23,9 +27,15 @@ int main() {
     printf("%s", "\n");
     } else {
     if ((numero == 0)) {
+<<<<<<< Updated upstream
     printf("%s", "El número es cero.\n");
     } else {
     printf("%s", "El número es negativo.\n");
+=======
+    printf("%s", "El número es cero. No se puede calcular la raíz cuadrada.\n");
+    } else {
+    printf("%s", "El número es negativo. No se puede calcular la raíz cuadrada.\n");
+>>>>>>> Stashed changes
     }
     }
     printf("%s", "Fin del análisis.\n");
