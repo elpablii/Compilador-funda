@@ -1,54 +1,21 @@
-// Declaración de variables
-enterito numero fin
-racional raiz fin
+int x;
+float y;
+string nombre;
 
-// Mensaje de inicio
-<<<<<<< Updated upstream
-imprima("=== Analizador de Número ===\n") fin
-=======
-imprima("=== Análisis de Número ===\n") fin
->>>>>>> Stashed changes
+x = 5;
+y = 2.5;
+nombre = "Sebas";
 
-// Solicitar número al usuario
-imprima("Ingrese un número entero: ") fin
-lease(numero) fin
+print("Introduce un número:");
+read(x);
 
-// Mostrar el valor leído
-imprima("Valor ingresado: ") fin
-imprima(numero) fin
-imprima("\n") fin
-
-<<<<<<< Updated upstream
-// Verificar si es positivo, negativo o cero
-=======
-// Verificar y actuar según el valor
->>>>>>> Stashed changes
-SI (numero mayorcito 0) {
-    imprima("El número es positivo.\n") fin
-    // Calcular raíz cuadrada aproximada
-    raiz igual numero dividido 2.0 fin
-    enterito i fin
-    i igual 0 fin
-    mientras (i menoroigual 10) {
-        raiz igual (raiz suma (numero dividido raiz)) dividido 2.0 fin
-        i igual i suma 1 fin
-    }
-    imprima("Raíz cuadrada aproximada: ") fin
-    imprima(raiz) fin
-    imprima("\n") fin
-} entonces {
-    SI (numero equivalea 0) {
-<<<<<<< Updated upstream
-        imprima("El número es cero.\n") fin
-    } entonces {
-        imprima("El número es negativo.\n") fin
-=======
-        imprima("El número es cero. No se puede calcular la raíz cuadrada.\n") fin
-    } entonces {
-        imprima("El número es negativo. No se puede calcular la raíz cuadrada.\n") fin
->>>>>>> Stashed changes
-    }
+if (x > 10) {
+    print("Mayor que 10");
+} else {
+    print("Menor o igual que 10");
 }
 
-// Mensaje de despedida
-imprima("Fin del análisis.\n") fin
+while (x > 0) {
+    print(x);
+    x = x - 1;
+}

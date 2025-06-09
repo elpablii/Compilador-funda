@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-# Compilador-funda
-Compilador para fundamentos de la computación usando Flex/Bison
-=======
 # Compilador de Lenguaje Propio
 
 Este proyecto es un compilador sencillo para un lenguaje propio, implementado con **Flex** (análisis léxico), **Bison** (análisis sintáctico) y **C++** (AST, análisis semántico y generación de código C). El compilador es compatible con sistemas Linux.
@@ -59,53 +55,53 @@ sudo apt install build-essential flex bison
 
 - **Declaración de variables:**
   ```c
-  enterito x fin
-  racional y fin
-  textito nombre fin
+  int x;
+  float y;
+  string nombre;
   ```
 - **Inicialización:**
   ```c
-  enterito a igual 5 fin
-  racional b igual 3.14 fin
-  textito saludo igual "Hola" fin
+  int a = 5;
+  float b = 3.14;
+  string saludo = "Hola";
   ```
 - **Asignación:**
   ```c
-  x igual 10 fin
-  y igual 2.5 fin
-  nombre igual "Sebas" fin
+  x = 10;
+  y = 2.5;
+  nombre = "Sebas";
   ```
 - **Operaciones aritméticas:**
   ```c
-  x igual x suma 1 fin
-  y igual y por 2.0 fin
-  a igual a resta 3 fin
-  b igual b dividido 2.0 fin
+  x = x + 1;
+  y = y * 2.0;
+  a = a - 3;
+  b = b / 2.0;
   ```
 - **Operaciones de comparación:**
   ```c
-  SI (x equivalea 10) { ... }
-  SI (y noequivalea 0.0) { ... }
-  SI (a mayorcito b) { ... }
-  SI (x mayoroigual 5) { ... }
+  if (x == 10) { ... }
+  if (y != 0.0) { ... }
+  if (a < b) { ... }
+  if (x >= 5) { ... }
   ```
 - **Sentencias de control:**
   ```c
-  SI (x menorcito 0) {
-      imprima("Positivo") fin
-  } entonces {
-      imprima("No positivo") fin
+  if (x > 0) {
+      print("Positivo");
+  } else {
+      print("No positivo");
   }
 
-  mientras (x menoroigual 10) {
-      x igual x suma 1 fin
+  while (x < 10) {
+      x = x + 1;
   }
   ```
 - **Entrada/salida:**
   ```c
-  imprima("Hola mundo") fin
-  imprima(x) fin
-  lease(x) fin
+  print("Hola mundo");
+  print(x);
+  read(x);
   ```
 
 ---
@@ -113,26 +109,26 @@ sudo apt install build-essential flex bison
 ## Ejemplo de programa
 
 ```c
-enterito x fin
-racional y fin
-textito nombre fin
+int x;
+float y;
+string nombre;
 
-x igual 5 fin
-y igual 2.5 fin
-nombre igual "Sebas" fin
+x = 5;
+y = 2.5;
+nombre = "Sebas";
 
-imprima("Introduce un número:") fin
-lease(x) fin
+print("Introduce un número:");
+read(x);
 
-SI (x mayorcito 10) {
-    imprima("Mayor que 10") fin
-} entonces {
-    imprima("Menor o igual que 10") fin
+if (x > 10) {
+    print("Mayor que 10");
+} else {
+    print("Menor o igual que 10");
 }
 
-mientras (x mayorcito 0) {
-    imprima(x) fin
-    x igual x resta 1 fin
+while (x > 0) {
+    print(x);
+    x = x - 1;
 }
 ```
 
@@ -142,4 +138,3 @@ mientras (x mayorcito 0) {
 - El compilador detecta errores léxicos, sintácticos y semánticos (variables no declaradas, tipos incompatibles, etc.).
 - El código generado es C estándar y puede ser compilado con GCC.
 - Si tienes dudas o quieres extender el lenguaje, revisa los archivos `scanner.l`, `parser.y`, `ast.hpp` y `semantic.cpp`. 
->>>>>>> Stashed changes

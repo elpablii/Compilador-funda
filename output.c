@@ -1,43 +1,22 @@
 // Código generado por el compilador
 #include <stdio.h>
 int main() {
-    int numero;
-    float raiz;
-<<<<<<< Updated upstream
-    printf("%s", "=== Analizador de Número ===\n");
-=======
-    printf("%s", "=== Análisis de Número ===\n");
->>>>>>> Stashed changes
-    printf("%s", "Ingrese un número entero: ");
-    scanf("%d", &numero);
-    printf("%s", "Valor ingresado: ");
-    printf("%d", numero);
-    printf("%s", "\n");
-    if ((numero > 0)) {
-    printf("%s", "El número es positivo.\n");
-    raiz = (numero / 2);
-    int i;
-    i = 0;
-    while ((i <= 10)) {
-    raiz = ((raiz + (numero / raiz)) / 2);
-    i = (i + 1);
-    }
-    printf("%s", "Raíz cuadrada aproximada: ");
-    printf("%f", raiz);
-    printf("%s", "\n");
+    int x;
+    float y;
+    char* nombre;
+    x = 5;
+    y = 2.5;
+    nombre = "Sebas";
+    printf("%s", "Introduce un número:");
+    scanf("%d", &x);
+    if ((x > 10)) {
+    printf("%s", "Mayor que 10");
     } else {
-    if ((numero == 0)) {
-<<<<<<< Updated upstream
-    printf("%s", "El número es cero.\n");
-    } else {
-    printf("%s", "El número es negativo.\n");
-=======
-    printf("%s", "El número es cero. No se puede calcular la raíz cuadrada.\n");
-    } else {
-    printf("%s", "El número es negativo. No se puede calcular la raíz cuadrada.\n");
->>>>>>> Stashed changes
+    printf("%s", "Menor o igual que 10");
     }
+    while ((x > 0)) {
+    printf("%d", x);
+    x = (x - 1);
     }
-    printf("%s", "Fin del análisis.\n");
     return 0;
 }

@@ -262,34 +262,13 @@ void WhileStatementNode::generateCode(std::ostream& os) const {
 void PrintStatementNode::generateCode(std::ostream& os) const {
     os << "    printf(";
     if (expression) {
-        // Detectar tipo de variable o literal
         if (expression->type == NodeType::STRING_LITERAL) {
             os << "\"%s\", ";
             expression->generateCode(os);
         } else if (expression->type == NodeType::FLOAT_LITERAL) {
             os << "\"%f\", ";
             expression->generateCode(os);
-        } else if (expression->type == NodeType::NUMBER_LITERAL) {
-            os << "\"%d\", ";
-            expression->generateCode(os);
-        } else if (expression->type == NodeType::IDENTIFIER) {
-<<<<<<< Updated upstream
-            // Buscar el tipo de la variable
-            auto* id = static_cast<const IdentifierNode*>(expression);
-            // Buscar en la lista de declaraciones previas
-            // (esto es un workaround simple, lo ideal sería tener un contexto de tipos)
-            // Por ahora, asumimos que si el nombre contiene 'raiz' o 'b', es float, si no, int
-=======
-            auto* id = static_cast<const IdentifierNode*>(expression);
->>>>>>> Stashed changes
-            if (id->name.find("raiz") != std::string::npos || id->name.find("b") != std::string::npos) {
-                os << "\"%f\", ";
-            } else {
-                os << "\"%d\", ";
-            }
-            expression->generateCode(os);
         } else {
-            // Por defecto, int
             os << "\"%d\", ";
             expression->generateCode(os);
         }

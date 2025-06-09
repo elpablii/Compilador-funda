@@ -1,218 +1,330 @@
-//Bison
-
 %{
-<<<<<<< Updated upstream
-#include <iostream>
-#include <string>
-#include <map>
-#include <stdexcept>
-=======
 // parser.y (skeleton en C++ para Bison)
-// Ahora el lenguaje usa palabras clave personalizadas:
-// enterito, racional, textito, SI, entonces, mientras, imprima, lease
-// igual, suma, resta, por, dividido, equivalea, noequivalea, menoroigual, mayoroigual, mayorcito, menorcito, fin
-// Ejemplo de declaración: enterito x fin; racional y fin; textito nombre fin;
-// Ejemplo de uso: x igual 5 fin
-// Condicional: SI (x mayorcito 10) { ... } entonces { ... }
-// Bucle: mientras (x mayorcito 0) { ... }
-// Imprimir: imprima(x) fin
-// Leer: lease(x) fin
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <string>        // std::string
+#include "ast.hpp"       // definiciones de Node, DataType, etc.
+
+// Prototipos de Flex/Bison
 extern int yylex();
-void yyerror(const char *msg);
 extern int yylineno;
+extern char *yytext;
+extern FILE *yyin;
 
-
-//Estructura para la información en la tabla de simbolos
-
-struct SymbolInfo{
-
-    enum Type { UNKNOWN, INTEGER, FLOAT } type;
-    union Value{
-        int iVal;
-        double fVal;
-    } value;
-    bool initialized;
-    std::string typeName;
-
-    SymbolInfo() : type(UNKNOWN), initialized(false) { value.fVal = 0.0; typeName = "desconocido";}
-} 
-
-// tabla de simbolos
-
-std::map<std::string, SymbolInfo> tabla_simbolos;
-
-//Función auxiliar para convertir tipo enum a string (para errores)
-
-std::string typeEnumToString(SymbolInfo::Type t) {
-    if (t == SymbolInfo::INTEGER) return "entero (zi)";
-    if (t == SymbolInfo::FLOAT) return "flotante (fl)";
-    return "desconocido";
-}
-
+// Función de error (se llama en errores sintácticos)
+void yyerror(const char *mensaje);
 %}
 
-
-%language "c++"
+/* Incluir ast.hpp antes de definir YYSTYPE */
+%code requires {
+    #include "ast.hpp"
+}
 
 %union {
-    int tero;
-    double fval;
-    std::string* ide;
+    Node*                     node;
+    StatementListNode*        stmt_list_node;
+    IdentifierNode*           id_node;
+    VariableDeclarationNode*  var_decl_node;
+    AssignmentNode*           assign_node;
+    IfStatementNode*          if_node;
+    WhileStatementNode*       while_node;
+    PrintStatementNode*       print_node;
+    ReadStatementNode*        read_node;
+
+    char*   sval;
+    int     ival;
+    float   fval;
+    DataType dtype;
 }
-//Definicion de tokens
-%token <tero> ENTERO
-%token <fval> FLOTANTE_LITERAL
-%token <ide> ID
 
-%token IGUAL SUMA MENOS MULTIPLICACION DIVIDE
-%token PRTSII PRTSID PUNTO_COMA FINL
-// tipo de las declaraciones
+/* Definición de tokens */
+%token <sval> T_IDENTIFIER
+%token <ival> T_INTEGER_LITERAL
+%token <fval> T_FLOAT_LITERAL
+%token <sval> T_STRING_LITERAL
 
-%token ZETA
-%token FLOTANTE_KEYWORD
+%token T_INT T_FLOAT T_STRING_TYPE
+%token T_IF T_ELSE T_WHILE
+%token T_PRINT T_READ
+%token T_ASSIGN T_PLUS T_MINUS T_MULTIPLY T_DIVIDE
+%token T_EQ T_NEQ T_LT T_GT T_LTE T_GTE
+%token T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_SEMICOLON
+%token T_ERROR
 
+/* Tipos para no-terminales */
+%type <node> program statement expression arithmetic_expression term factor primary_expression comparison_expression
+%type <stmt_list_node> statement_list block
+%type <id_node> identifier
+%type <var_decl_node> variable_declaration
+%type <assign_node> assignment_statement
+%type <if_node> if_statement
+%type <while_node> while_statement
+%type <print_node> print_statement
+%type <read_node> read_statement
+%type <dtype> type_specifier
 
-//Precedencias
-%left SUMA MENOS
-%left MULTIPLICACION DIVIDE
-%left NEGATIVO
+/* Precedencia de operadores */
+%left T_EQ T_NEQ
+%left T_LT T_GT T_LTE T_GTE
+%left T_PLUS T_MINUS
+%left T_MULTIPLY T_DIVIDE
+%right T_ASSIGN
+
+%code {
+    // ast_root guarda el AST generado
+    Node* ast_root = nullptr;
+}
 
 %%
 
-programa:
-    | programa linea
-;
-linea:
-    declaracion PUNTO_COMA  FINL
-    | asignamiento PUNTO_COMA FINL
-    | prtsi PUNTO_COMA FINL {std::cout << "Resultado expresión (línea " << yylineno << "): " << $1 << std::endl;}
-    | FINL
-    | error FINL            { yyerrok; std::cout << "Error recuperado en línea." << std::endl; }
-    
-;
-
-declaracion:
-    ZETA ID {
-        std::string varName = *$2;
-        if (tabla_simbolos.count(varName)) {
-            yyerror(("Error semántico: Variable '" + varName + "' ya declarada.").c_str());
-        } else {
-            SymbolInfo info;
-            info.type = SymbolInfo::INTEGER;
-            info.typeName = "entero (zi)";
-            info.initialized = false;
-            tabla_simbolos[varName] = info;
-            std::cout << "Variable '" << varName << "' declarada como " << info.typeName << "." << std::endl;
-        }
-        delete $2;
-    }
-    | FLOTANTE_KEYWORD ID { // NUEVA REGLA PARA FLOTANTES
-        std::string varName = *$2;
-        if (tabla_simbolos.count(varName)) {
-            yyerror(("Error semántico: Variable '" + varName + "' ya declarada.").c_str());
-        } else {
-            SymbolInfo info;
-            info.type = SymbolInfo::FLOAT;
-            info.typeName = "flotante (fl)";
-            info.initialized = false;
-            tabla_simbolos[varName] = info;
-            std::cout << "Variable '" << varName << "' declarada como " << info.typeName << "." << std::endl;
-        }
-        delete $2; // Liberar la memoria del string
+program:
+    statement_list
+    {
+        ast_root = new ProgramNode($1);
     }
 ;
 
-asignamiento:
-    ID IGUAL prtsi {
-        std::string varName = *$1;
-        if (tabla_simbolos.find(varName) == tabla_simbolos.end()) {
-            yyerror(("Error semántico: Variable '" + varName + "' no ha sido declarada.").c_str());
-        } else {
-            SymbolInfo& info = tabla_simbolos[varName];
-            double exprVal = $3;
-
-            if (info.type == SymbolInfo::INTEGER) {
-                
-                info.value.iVal = static_cast<int>(exprVal);
-                std::cout << "Asignado " << info.value.iVal << " (de " << exprVal << ") a la variable entera '" << varName << "'." << std::endl;
-            } else if (info.type == SymbolInfo::FLOAT) {
-                info.value.fVal = exprVal;
-                std::cout << "Asignado " << info.value.fVal << " a la variable flotante '" << varName << "'." << std::endl;
-            } else {
-                 yyerror(("Error semántico: Tipo desconocido para la variable '" + varName + "' en asignación.").c_str());
-            }
-            info.initialized = true;
-        }
-        delete $1; // Liberar memoria
-    } 
-
-
-prtsi:
-    ENTERO { $$ = static_cast<double>($1); }  
-    | FLOTANTE_LITERAL { $$ = $1; }
-    | ID {
-        std::string varName = *$1;
-        if (tabla_simbolos.find(varName) == tabla_simbolos.end()) {
-            yyerror(("Error semántico: Variable '" + varName + "' no declarada usada en expresión.").c_str());
-            $$ = 0.0; // Valor de error o lanzar excepción
-        } else {
-            const SymbolInfo& info = tabla_simbolos.at(varName);
-            if (!info.initialized) {
-                 
-                 std::cout << "Advertencia semántica: Variable '" << varName << "' usada sin inicializar (usando valor por defecto 0 o 0.0)." << std::endl;
-            }
-
-            if (info.type == SymbolInfo::INTEGER) {
-                $$ = static_cast<double>(info.value.iVal);
-            } else if (info.type == SymbolInfo::FLOAT) {
-                $$ = info.value.fVal;
-            } else {
-                yyerror(("Error semántico: Variable '" + varName + "' de tipo no numérico ("+ info.typeName +") usada en expresión aritmética.").c_str());
-                $$ = 0.0; // Valor de error
-            }
-        }
-        delete $1; // Liberar memoria
+statement_list:
+      /* vacío */
+    {
+        $$ = new StatementListNode();
     }
+  | statement_list statement
+    {
+        if ($2) {
+            $1->statements.push_back($2);
+        }
+        $$ = $1;
+    }
+;
 
-    | prtsi SUMA prtsi         { $$ = $1 + $3; }  
-    | prtsi MENOS prtsi        { $$ = $1 - $3; }  
-    | prtsi MULTIPLICACION prtsi        { $$ = $1 * $3; }  
-    | prtsi DIVIDE prtsi        {
-                                  if ($3 == 0.0) {
-                                    yyerror("Error semántico: División por cero.");
-                                  
-                                  } else {
+statement:
+      variable_declaration
+    {
+        $$ = $1;
+    }
+  | assignment_statement
+    {
+        $$ = $1;
+    }
+  | if_statement
+    {
+        $$ = $1;
+    }
+  | while_statement
+    {
+        $$ = $1;
+    }
+  | print_statement
+    {
+        $$ = $1;
+    }
+  | read_statement
+    {
+        $$ = $1;
+    }
+  | block
+    {
+        $$ = $1;
+    }
+  | T_SEMICOLON
+    {
+        $$ = nullptr;  // Instrucción vacía
+    }
+  | T_ERROR T_SEMICOLON
+    {
+        yyerrok;
+        $$ = nullptr;
+    }
+;
 
-                                    $$ = $1 / $3;
-                                  }
-                                }  
-    | PRTSII prtsi PRTSID       { $$ = $2; } 
+block:
+    T_LBRACE statement_list T_RBRACE
+    {
+        $$ = $2;
+    }
+;
+
+/* Especificador de tipos */
+type_specifier:
+      T_INT
+    {
+        $$ = DataType::INT;
+    }
+  | T_FLOAT
+    {
+        $$ = DataType::FLOAT;
+    }
+  | T_STRING_TYPE
+    {
+        $$ = DataType::STRING;
+    }
+;
+
+variable_declaration:
+      type_specifier identifier T_SEMICOLON
+    {
+        $$ = new VariableDeclarationNode($1, $2, nullptr);
+    }
+  | type_specifier identifier T_ASSIGN expression T_SEMICOLON
+    {
+        $$ = new VariableDeclarationNode($1, $2, $4);
+    }
+;
+
+assignment_statement:
+    identifier T_ASSIGN expression T_SEMICOLON
+    {
+        $$ = new AssignmentNode($1, $3);
+    }
+;
+
+if_statement:
+      T_IF T_LPAREN expression T_RPAREN block
+    {
+        $$ = new IfStatementNode($3, $5, nullptr);
+    }
+  | T_IF T_LPAREN expression T_RPAREN block T_ELSE block
+    {
+        $$ = new IfStatementNode($3, $5, $7);
+    }
+;
+
+while_statement:
+    T_WHILE T_LPAREN expression T_RPAREN block
+    {
+        $$ = new WhileStatementNode($3, $5);
+    }
+;
+
+print_statement:
+    T_PRINT T_LPAREN expression T_RPAREN T_SEMICOLON
+    {
+        $$ = new PrintStatementNode($3);
+    }
+;
+
+read_statement:
+    T_READ T_LPAREN identifier T_RPAREN T_SEMICOLON
+    {
+        $$ = new ReadStatementNode($3);
+    }
+;
+
+expression:
+    comparison_expression
+    {
+        $$ = $1;
+    }
+;
+
+comparison_expression:
+      arithmetic_expression
+    {
+        $$ = $1;
+    }
+  | arithmetic_expression T_EQ arithmetic_expression
+    {
+        $$ = new BinaryOperationNode("==", $1, $3);
+    }
+  | arithmetic_expression T_NEQ arithmetic_expression
+    {
+        $$ = new BinaryOperationNode("!=", $1, $3);
+    }
+  | arithmetic_expression T_LT arithmetic_expression
+    {
+        $$ = new BinaryOperationNode("<", $1, $3);
+    }
+  | arithmetic_expression T_GT arithmetic_expression
+    {
+        $$ = new BinaryOperationNode(">", $1, $3);
+    }
+  | arithmetic_expression T_LTE arithmetic_expression
+    {
+        $$ = new BinaryOperationNode("<=", $1, $3);
+    }
+  | arithmetic_expression T_GTE arithmetic_expression
+    {
+        $$ = new BinaryOperationNode(">=", $1, $3);
+    }
+;
+
+arithmetic_expression:
+      term
+    {
+        $$ = $1;
+    }
+  | arithmetic_expression T_PLUS term
+    {
+        $$ = new BinaryOperationNode("+", $1, $3);
+    }
+  | arithmetic_expression T_MINUS term
+    {
+        $$ = new BinaryOperationNode("-", $1, $3);
+    }
+;
+
+term:
+      factor
+    {
+        $$ = $1;
+    }
+  | term T_MULTIPLY factor
+    {
+        $$ = new BinaryOperationNode("*", $1, $3);
+    }
+  | term T_DIVIDE factor
+    {
+        $$ = new BinaryOperationNode("/", $1, $3);
+    }
+;
+
+factor:
+    primary_expression
+    {
+        $$ = $1;
+    }
+;
+
+primary_expression:
+      identifier
+    {
+        $$ = $1;
+    }
+  | T_INTEGER_LITERAL
+    {
+        $$ = new NumberLiteralNode($1);
+    }
+  | T_FLOAT_LITERAL
+    {
+        $$ = new FloatLiteralNode($1);
+    }
+  | T_STRING_LITERAL
+    {
+        std::string cad($1);
+        free($1);
+        $$ = new StringLiteralNode(cad);
+    }
+  | T_LPAREN expression T_RPAREN
+    {
+        $$ = $2;
+    }
+;
+
+identifier:
+    T_IDENTIFIER
+    {
+        std::string nombre($1);
+        free($1);
+        $$ = new IdentifierNode(nombre);
+    }
 ;
 
 %%
 
-void yyerror(const char *msg) {
-    std::cerr << "Error (línea " << yylineno << "): " << msg << std::endl;
+void yyerror(const char *mensaje) {
+    std::fprintf(stderr, "Error en línea %d cerca de '%s': %s\n",
+                 yylineno, yytext, mensaje);
 }
-
-int main() {
-    std::cout << "=== Inicio del Compilador ===" << std::endl;
-    std::cout << "Introduce código (zi <id>; fl <id>; <id> = <expr>; <expr>; )" << std::endl;
-    std::cout << "Cada sentencia debe terminar con ; y un ENTER." << std::endl;
-    std::cout << "----------------------------" << std::endl;
-    int result = yyparse();
-    std::cout << "----------------------------" << std::endl;
-    if (result == 0) {
-        std::cout << "=== Compilación (interpretación directa) exitosa ===" << std::endl;
-    } else {
-        std::cout << "=== Compilación fallida con " << result << " error(es) sintáctico(s) graves ===" << std::endl;
-    }
-    return result;
-}
-
-

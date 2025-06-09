@@ -1,91 +1,109 @@
-//Flex
-
 %{
-#include "parser.tab.hpp"
-#include <string>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>    // malloc, exit, atof, atoi
+#include <string.h>    // strncpy, strdup
+#include "ast.hpp"     // para YYSTYPE complejo
+#include "parser.tab.h"// tokens T_IDENTIFIER, YYSTYPE, etc.
+
+/* Prototipo para reportar errores desde el scanner */
+extern void yyerror(const char *mensaje);
+
+/* Función auxiliar para copiar el texto actual de yytext */
+char *copiarTexto() {
+    char *cadena = (char *) malloc(yyleng + 1);
+    if (!cadena) {
+        yyerror("Error de memoria en copiarTexto");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(cadena, yytext, yyleng);
+    cadena[yyleng] = '\0';
+    return cadena;
+}
 %}
 
-%option c++
-%option noyywrap
-%option yylineno
+%option nounput
+%option yylineno noyywrap
+
+DIGITO         [0-9]
+IDENTIFICADOR  [a-zA-Z_][a-zA-Z0-9_]*
+ESPACIO        [ \t\r]+
+NUEVALINEA     \n
 
 %%
 
-//Definiendo identificadores para los tipos de variables
+{ESPACIO}            { /* Ignorar espacios, tabulaciones y retornos de carro */ }
+{NUEVALINEA}         { /* Flex actualiza yylineno automáticamente */ }
 
-<<<<<<< Updated upstream
-[a-zA-Z_][a-zA-Z0-9_]* { 
-    yylval.ide = new std::string(yytext);
-    return ID; 
-=======
 "//".*               { /* Ignorar comentario de línea */ }
 "/*"([^*]|\*+[^*/])*\*+"/"  { /* Ignorar comentario de bloque */ }
 
-"enterito"           { return T_INT; }
-"racional"           { return T_FLOAT; }
-"textito"          { return T_STRING_TYPE; }
-"SI"                 { return T_IF; }
-"entonces"           { return T_ELSE; }
-"mientras"         { return T_WHILE; }
-"imprima"          { return T_PRINT; }
-"lease"            { return T_READ; }
+"int"                { return T_INT; }
+"float"              { return T_FLOAT; }
+"string"             { return T_STRING_TYPE; }
+"if"                 { return T_IF; }
+"else"               { return T_ELSE; }
+"while"              { return T_WHILE; }
+"print"              { return T_PRINT; }
+"read"               { return T_READ; }
 
-"igual"            { return T_ASSIGN; }
-"suma"             { return T_PLUS; }
-"resta"            { return T_MINUS; }
-"por"              { return T_MULTIPLY; }
-"dividido"         { return T_DIVIDE; }
+"="                  { return T_ASSIGN; }
+"+"                  { return T_PLUS; }
+"-"                  { return T_MINUS; }
+"*"                  { return T_MULTIPLY; }
+"/"                  { return T_DIVIDE; }
 
-"equivalea"        { return T_EQ; }
-"noequivalea"      { return T_NEQ; }
-"menoroigual"      { return T_LTE; }
-"mayoroigual"      { return T_GTE; }
-"mayorcito"        { return T_GT; }
-"menorcito"        { return T_LT; }
-
-"fin"                { return T_SEMICOLON; }
+"=="                 { return T_EQ; }
+"!="                 { return T_NEQ; }
+"<="                 { return T_LTE; }
+">="                 { return T_GTE; }
+"<"                  { return T_LT; }
+">"                  { return T_GT; }
 
 "("                  { return T_LPAREN; }
 ")"                  { return T_RPAREN; }
 "{"                  { return T_LBRACE; }
 "}"                  { return T_RBRACE; }
+";"                  { return T_SEMICOLON; }
 
 {DIGITO}+"."{DIGITO}+ {
     yylval.fval = atof(yytext);
     return T_FLOAT_LITERAL;
->>>>>>> Stashed changes
 }
 
-//Palabras reservadas enteros
-
-"zi"        {return ZETA:}
-"fl"        {return FLOTANTE_KEYWORD:}
-
-// Definiendo la regla correspondiendo a los enteros
-[-+]?[0-9]+ {
-    yyval.tero = std::stoi(yytext);
-    return ENTERO; 
+{DIGITO}+           {
+    yylval.ival = atoi(yytext);
+    return T_INTEGER_LITERAL;
 }
 
-// Definiendo la regla correspondiendo a los flotantes
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.)([eE][-+]?[0-9]+)? {
-    yylval.fval = std::stod(yytext);
-    return FLOTANTE_LITERAL;
+{IDENTIFICADOR}      {
+    yylval.sval = copiarTexto();
+    return T_IDENTIFIER;
 }
 
+\"([^\"\n])*\"       {
+    /* Extraer literales de cadena sin las comillas */
+    size_t longitud = yyleng - 2;
+    char *cadena = (char *) malloc(longitud + 1);
+    if (!cadena) {
+        yyerror("Error de memoria en literal de cadena");
+        return T_ERROR;
+    }
+    strncpy(cadena, yytext + 1, longitud);
+    cadena[longitud] = '\0';
+    yylval.sval = cadena;
+    return T_STRING_LITERAL;
+}
 
+[\x80-\xFF]     { /* descartar bytes de alto bit */ }
+.                    {
+    char mensaje[256];
+    int tamanno = yyleng > 200 ? 200 : yyleng;
+    snprintf(mensaje, sizeof(mensaje),
+             "Caracter inesperado: '%.*s'",
+             tamanno,
+             yytext);
+    yyerror(mensaje);
+    /* Opcional: return T_ERROR; */
+}
 
-// Operadores y simbolos
-"="         {return IGUAL;}
-"+"         {return SUMA;}
-"-"         { return MENOS; }  
-"*"         { return MULTIPLICACION; } 
-"/"         { return DIVIDE; }
-";"         {return PUNTO_COMA;}
-"("         {return PRTSII}
-")"         {return PRTSID}
-\n          { return FINL; }    
-[ \t]       ; //ignora espacio y tabs
-.           { std::cerr << "Error: Carácter inválido\n"; }
 %%
