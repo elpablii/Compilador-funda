@@ -15,7 +15,6 @@ int main() {
     printf("%s\n", "Menor o igual que 10");
     }
     while ((x > 0)) {
-    printf("%d\n", x);
     x = (x - 1);
     }
     return 0;
