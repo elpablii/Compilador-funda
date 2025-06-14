@@ -20,6 +20,7 @@ static DataType obtenerTipo(Node* node, TablaSimbolos& tabla, std::vector<Semant
         case NodeType::BOOL_LITERAL:   return DataType::BOOL;
         case NodeType::BINARY_OPERATION: {
             auto* bin = static_cast<BinaryOperationNode*>(node);
+            // Aquí no se usan los nombres de tokens, solo los valores de los operadores
             if (bin->op == "&&" || bin->op == "||") {
                 DataType izq = obtenerTipo(bin->left, tabla, errores);
                 DataType der = obtenerTipo(bin->right, tabla, errores);
@@ -35,7 +36,7 @@ static DataType obtenerTipo(Node* node, TablaSimbolos& tabla, std::vector<Semant
                 errores.push_back({"Negación lógica sobre tipo incompatible", 0});
                 return DataType::VOID;
             }
-            if (bin->op == "==" || bin->op == "!=" || bin->op == "<" || bin->op == ">" || bin->op == "<=" || bin->op == ">=")
+            if (bin->op == "equilibrio" || bin->op == "rebelde" || bin->op == "highground" || bin->op == "youUnderestimateMyPower" || bin->op == "padawan" || bin->op == "maestro")
                 return DataType::BOOL;
             DataType izq = obtenerTipo(bin->left, tabla, errores);
             DataType der = obtenerTipo(bin->right, tabla, errores);

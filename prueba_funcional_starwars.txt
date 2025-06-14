@@ -1,0 +1,50 @@
+r2d2 fuerza;
+c3p0 midiclorianos;
+deathStar mensaje;
+booleano ladoLuz;
+booleano ladoOscuro;
+
+palpatine("--- Prueba de asignación e impresión ---");
+fuerza teOtorgamos 5;
+palpatine(fuerza);
+midiclorianos teOtorgamos 3.14;
+palpatine(midiclorianos);
+mensaje teOtorgamos "Hola desde la galaxia";
+palpatine(mensaje);
+
+palpatine("--- Prueba de operaciones matemáticas ---");
+fuerza teOtorgamos fuerza luz 10;
+palpatine(fuerza);
+fuerza teOtorgamos fuerza oscuridad 2;
+palpatine(fuerza);
+fuerza teOtorgamos fuerza unlimitedPower 3;
+palpatine(fuerza);
+fuerza teOtorgamos fuerza lightsable 2;
+palpatine(fuerza);
+
+palpatine("--- Prueba de input ---");
+palpatine("Introduce un valor para fuerza:");
+leia(fuerza);
+palpatine(fuerza);
+
+palpatine("--- Prueba de lógica y condicionales ---");
+ladoLuz teOtorgamos obiwan;
+ladoOscuro teOtorgamos anakin;
+
+jedi (fuerza equilibrio 10) {
+    palpatine("La fuerza está equilibrada");
+} sith {
+    palpatine("La fuerza NO está equilibrada");
+}
+
+jedi (ladoLuz) {
+    palpatine("El lado luminoso prevalece");
+} sith {
+    palpatine("El lado oscuro prevalece");
+}
+
+palpatine("--- Prueba de ciclo while ---");
+cloneWar (fuerza highground 10) {
+    palpatine(fuerza);
+    fuerza teOtorgamos fuerza luz 1;
+}

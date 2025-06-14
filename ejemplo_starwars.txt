@@ -1,0 +1,28 @@
+r2d2 fuerza;
+c3p0 midiclorianos;
+deathStar mensaje;
+booleano ladoLuz;
+booleano ladoOscuro;
+
+fuerza teOtorgamos 10;
+midiclorianos teOtorgamos 20.5;
+mensaje teOtorgamos "Que la fuerza te acompañe";
+ladoLuz teOtorgamos obiwan;
+ladoOscuro teOtorgamos anakin;
+
+jedi (fuerza equilibrio 10) {
+    palpatine("Eres un verdadero Jedi");
+} sith {
+    palpatine("Aún eres un padawan");
+}
+
+cloneWar (fuerza highground 20) {
+    fuerza teOtorgamos fuerza luz 1;
+    palpatine("Entrenando con la fuerza...");
+}
+
+leia(fuerza);
+
+jedi (ladoLuz) {
+    palpatine("El equilibrio está en la fuerza");
+}

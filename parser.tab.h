@@ -70,31 +70,32 @@ extern int yydebug;
     T_IF = 265,                    /* T_IF  */
     T_ELSE = 266,                  /* T_ELSE  */
     T_WHILE = 267,                 /* T_WHILE  */
-    T_PRINT = 268,                 /* T_PRINT  */
-    T_READ = 269,                  /* T_READ  */
-    T_ASSIGN = 270,                /* T_ASSIGN  */
-    T_PLUS = 271,                  /* T_PLUS  */
-    T_MINUS = 272,                 /* T_MINUS  */
-    T_MULTIPLY = 273,              /* T_MULTIPLY  */
-    T_DIVIDE = 274,                /* T_DIVIDE  */
-    T_EQ = 275,                    /* T_EQ  */
-    T_NEQ = 276,                   /* T_NEQ  */
-    T_LT = 277,                    /* T_LT  */
-    T_GT = 278,                    /* T_GT  */
-    T_LTE = 279,                   /* T_LTE  */
-    T_GTE = 280,                   /* T_GTE  */
-    T_LPAREN = 281,                /* T_LPAREN  */
-    T_RPAREN = 282,                /* T_RPAREN  */
-    T_LBRACE = 283,                /* T_LBRACE  */
-    T_RBRACE = 284,                /* T_RBRACE  */
-    T_SEMICOLON = 285,             /* T_SEMICOLON  */
-    T_ERROR = 286,                 /* T_ERROR  */
-    T_BOOL = 287,                  /* T_BOOL  */
-    T_TRUE = 288,                  /* T_TRUE  */
-    T_FALSE = 289,                 /* T_FALSE  */
-    T_AND = 290,                   /* T_AND  */
-    T_OR = 291,                    /* T_OR  */
-    T_NOT = 292                    /* T_NOT  */
+    T_FOR = 268,                   /* T_FOR  */
+    T_PRINT = 269,                 /* T_PRINT  */
+    T_READ = 270,                  /* T_READ  */
+    T_ASSIGN = 271,                /* T_ASSIGN  */
+    T_PLUS = 272,                  /* T_PLUS  */
+    T_MINUS = 273,                 /* T_MINUS  */
+    T_MULTIPLY = 274,              /* T_MULTIPLY  */
+    T_DIVIDE = 275,                /* T_DIVIDE  */
+    T_EQ = 276,                    /* T_EQ  */
+    T_NEQ = 277,                   /* T_NEQ  */
+    T_LT = 278,                    /* T_LT  */
+    T_GT = 279,                    /* T_GT  */
+    T_LTE = 280,                   /* T_LTE  */
+    T_GTE = 281,                   /* T_GTE  */
+    T_LPAREN = 282,                /* T_LPAREN  */
+    T_RPAREN = 283,                /* T_RPAREN  */
+    T_LBRACE = 284,                /* T_LBRACE  */
+    T_RBRACE = 285,                /* T_RBRACE  */
+    T_SEMICOLON = 286,             /* T_SEMICOLON  */
+    T_ERROR = 287,                 /* T_ERROR  */
+    T_BOOL = 288,                  /* T_BOOL  */
+    T_TRUE = 289,                  /* T_TRUE  */
+    T_FALSE = 290,                 /* T_FALSE  */
+    T_AND = 291,                   /* T_AND  */
+    T_OR = 292,                    /* T_OR  */
+    T_NOT = 293                    /* T_NOT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -120,7 +121,7 @@ union YYSTYPE
     float   fval;
     DataType dtype;
 
-#line 124 "parser.tab.h"
+#line 125 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

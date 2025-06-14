@@ -39,35 +39,14 @@ void yyerror(const char *mensaje);
     DataType dtype;
 }
 
-/* Definición de tokens personalizados:
-   enteros    -> T_INT
-   flotantes  -> T_FLOAT
-   texto      -> T_STRING_TYPE
-   if         -> T_IF
-   else       -> T_ELSE
-   while      -> T_WHILE
-   print      -> T_PRINT
-   read       -> T_READ
-   =          -> T_ASSIGN
-   +          -> T_PLUS
-   -          -> T_MINUS
-   *          -> T_MULTIPLY
-   /          -> T_DIVIDE
-   ==         -> T_EQ
-   !=         -> T_NEQ
-   <=         -> T_LTE
-   >=         -> T_GTE
-   <          -> T_LT
-   >          -> T_GT
-   ;          -> T_SEMICOLON
-*/
+/* Definición de tokens personalizados Star Wars */
 %token <sval> T_IDENTIFIER
 %token <ival> T_INTEGER_LITERAL
 %token <fval> T_FLOAT_LITERAL
 %token <sval> T_STRING_LITERAL
 
 %token T_INT T_FLOAT T_STRING_TYPE
-%token T_IF T_ELSE T_WHILE
+%token T_IF T_ELSE T_WHILE T_FOR
 %token T_PRINT T_READ
 %token T_ASSIGN T_PLUS T_MINUS T_MULTIPLY T_DIVIDE
 %token T_EQ T_NEQ T_LT T_GT T_LTE T_GTE
