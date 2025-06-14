@@ -73,6 +73,8 @@ void yyerror(const char *mensaje);
 %token T_EQ T_NEQ T_LT T_GT T_LTE T_GTE
 %token T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_SEMICOLON
 %token T_ERROR
+%token T_BOOL T_TRUE T_FALSE
+%token T_AND T_OR T_NOT
 
 /* Tipos para no-terminales */
 %type <node> program statement expression arithmetic_expression term factor primary_expression comparison_expression
@@ -85,6 +87,7 @@ void yyerror(const char *mensaje);
 %type <print_node> print_statement
 %type <read_node> read_statement
 %type <dtype> type_specifier
+%type <node> bool_literal
 
 /* Precedencia de operadores */
 %left T_EQ T_NEQ
@@ -171,17 +174,13 @@ block:
 /* Especificador de tipos */
 type_specifier:
       T_INT
-    {
-        $$ = DataType::INT;
-    }
+    { $$ = DataType::INT; }
   | T_FLOAT
-    {
-        $$ = DataType::FLOAT;
-    }
+    { $$ = DataType::FLOAT; }
   | T_STRING_TYPE
-    {
-        $$ = DataType::STRING;
-    }
+    { $$ = DataType::STRING; }
+  | T_BOOL
+    { $$ = DataType::BOOL; }
 ;
 
 variable_declaration:
@@ -235,10 +234,10 @@ read_statement:
 ;
 
 expression:
-    comparison_expression
-    {
-        $$ = $1;
-    }
+    expression T_AND expression { $$ = new BinaryOperationNode("&&", $1, $3); }
+  | expression T_OR expression { $$ = new BinaryOperationNode("||", $1, $3); }
+  | T_NOT expression           { $$ = new BinaryOperationNode("!", $2, nullptr); }
+  | comparison_expression     { $$ = $1; }
 ;
 
 comparison_expression:
@@ -311,27 +310,21 @@ factor:
 
 primary_expression:
       identifier
-    {
-        $$ = $1;
-    }
+    { $$ = $1; }
   | T_INTEGER_LITERAL
-    {
-        $$ = new NumberLiteralNode($1);
-    }
+    { $$ = new NumberLiteralNode($1); }
   | T_FLOAT_LITERAL
-    {
-        $$ = new FloatLiteralNode($1);
-    }
+    { $$ = new FloatLiteralNode($1); }
   | T_STRING_LITERAL
-    {
-        std::string cad($1);
-        free($1);
-        $$ = new StringLiteralNode(cad);
-    }
+    { std::string cad($1); free($1); $$ = new StringLiteralNode(cad); }
+  | bool_literal
+    { $$ = $1; }
   | T_LPAREN expression T_RPAREN
-    {
-        $$ = $2;
-    }
+    { $$ = $2; }
+;
+bool_literal:
+      T_TRUE  { $$ = new BoolLiteralNode(true); }
+    | T_FALSE { $$ = new BoolLiteralNode(false); }
 ;
 
 identifier:

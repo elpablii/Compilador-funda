@@ -45,6 +45,9 @@ NUEVALINEA     \n
 "while"                  { return T_WHILE; }
 "print"                  { return T_PRINT; }
 "read"                   { return T_READ; }
+"booleano"                { return T_BOOL; }
+"true"                    { yylval.ival = 1; return T_TRUE; }
+"false"                   { yylval.ival = 0; return T_FALSE; }
 
 "="                      { return T_ASSIGN; }
 "+"                      { return T_PLUS; }
@@ -64,6 +67,10 @@ NUEVALINEA     \n
 "{"                      { return T_LBRACE; }
 "}"                      { return T_RBRACE; }
 ";"                      { return T_SEMICOLON; }
+
+"&&"                     { return T_AND; }
+"||"                     { return T_OR; }
+"!"                      { return T_NOT; }
 
 {DIGITO}+"."{DIGITO}+ {
     yylval.fval = atof(yytext);

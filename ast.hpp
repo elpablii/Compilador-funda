@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <iostream> // Para std::ostream
+#include <unordered_map>
 
 // Enumeración para los tipos de nodos del AST
 enum class NodeType {
@@ -23,6 +24,7 @@ enum class NodeType {
     NUMBER_LITERAL,
     FLOAT_LITERAL,
     STRING_LITERAL,
+    BOOL_LITERAL,         // Nuevo tipo de nodo para booleanos
     IDENTIFIER
 };
 
@@ -31,6 +33,7 @@ enum class DataType {
     INT,
     FLOAT,
     STRING,
+    BOOL,                 // Nuevo tipo booleano
     VOID                  // Para funciones o sentencias sin valor de retorno
 };
 
@@ -338,11 +341,26 @@ struct ReadStatementNode : public Node {
 };
 
 // ----------------------------------------------------------------------------
+// Nodo para literales booleanos
+// ----------------------------------------------------------------------------
+struct BoolLiteralNode : public Node {
+    bool value;
+
+    explicit BoolLiteralNode(bool val)
+        : Node(NodeType::BOOL_LITERAL), value(val) {}
+
+    void print(std::ostream& os, int indent = 0) const override;
+    void generateCode(std::ostream& os) const override;
+};
+
+// ----------------------------------------------------------------------------
 // Prototipo para imprimir el AST completo
 // ----------------------------------------------------------------------------
 void printAST(const Node* root, std::ostream& os);
 
 // Prototipo para generar código desde el AST completo
 void generateCodeFromAST(const Node* root, std::ostream& os);
+
+extern std::unordered_map<std::string, DataType> variableTypes;
 
 #endif // AST_HPP

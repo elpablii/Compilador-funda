@@ -88,7 +88,13 @@ extern int yydebug;
     T_LBRACE = 283,                /* T_LBRACE  */
     T_RBRACE = 284,                /* T_RBRACE  */
     T_SEMICOLON = 285,             /* T_SEMICOLON  */
-    T_ERROR = 286                  /* T_ERROR  */
+    T_ERROR = 286,                 /* T_ERROR  */
+    T_BOOL = 287,                  /* T_BOOL  */
+    T_TRUE = 288,                  /* T_TRUE  */
+    T_FALSE = 289,                 /* T_FALSE  */
+    T_AND = 290,                   /* T_AND  */
+    T_OR = 291,                    /* T_OR  */
+    T_NOT = 292                    /* T_NOT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -114,7 +120,7 @@ union YYSTYPE
     float   fval;
     DataType dtype;
 
-#line 118 "parser.tab.h"
+#line 124 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

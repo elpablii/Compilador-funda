@@ -3,6 +3,7 @@
 
 #include "ast.hpp"
 #include <iostream>
+#include <unordered_map>
 
 // Función auxiliar para convertir DataType a cadena
 std::string tipoDatoAString(DataType dt) {
@@ -10,6 +11,7 @@ std::string tipoDatoAString(DataType dt) {
         case DataType::INT:    return "INT";
         case DataType::FLOAT:  return "FLOAT";
         case DataType::STRING: return "STRING";
+        case DataType::BOOL:   return "BOOL";
         case DataType::VOID:   return "VOID";
         default:               return "UNKNOWN_TYPE";
     }
@@ -164,6 +166,16 @@ void ReadStatementNode::print(std::ostream& os, int indent) const {
     }
 }
 
+void BoolLiteralNode::print(std::ostream& os, int indent) const {
+    os << std::string(indent, ' ')
+       << "BoolLiteralNode: " << (value ? "true" : "false") << "\n";
+}
+void BoolLiteralNode::generateCode(std::ostream& os) const {
+    os << (value ? "1" : "0");
+}
+
+std::unordered_map<std::string, DataType> variableTypes;
+
 // Función global para imprimir el AST completo
 void printAST(const Node* root, std::ostream& os) {
     if (root) {
@@ -205,6 +217,12 @@ void IdentifierNode::generateCode(std::ostream& os) const {
 }
 
 void BinaryOperationNode::generateCode(std::ostream& os) const {
+    if (op == "!") {
+        os << "(!";
+        if (left) left->generateCode(os);
+        os << ")";
+        return;
+    }
     os << "(";
     if (left) left->generateCode(os);
     os << " " << op << " ";
@@ -218,8 +236,10 @@ void VariableDeclarationNode::generateCode(std::ostream& os) const {
         case DataType::INT: tipo = "int"; break;
         case DataType::FLOAT: tipo = "float"; break;
         case DataType::STRING: tipo = "char*"; break;
+        case DataType::BOOL: tipo = "int"; break; // Representar booleanos como int en C
         default: tipo = "int"; break;
     }
+    if (identifier) variableTypes[identifier->name] = varType;
     os << "    " << tipo << " ";
     if (identifier) identifier->generateCode(os);
     if (initialization) {
@@ -262,16 +282,32 @@ void WhileStatementNode::generateCode(std::ostream& os) const {
 void PrintStatementNode::generateCode(std::ostream& os) const {
     os << "    printf(";
     if (expression) {
-        if (expression->type == NodeType::STRING_LITERAL) {
-            os << "\"%s\\n\", ";
-            expression->generateCode(os);
+        DataType tipo = DataType::INT;
+        if (expression->type == NodeType::IDENTIFIER) {
+            auto* id = static_cast<const IdentifierNode*>(expression);
+            auto it = variableTypes.find(id->name);
+            if (it != variableTypes.end()) tipo = it->second;
+        } else if (expression->type == NodeType::STRING_LITERAL) {
+            tipo = DataType::STRING;
         } else if (expression->type == NodeType::FLOAT_LITERAL) {
-            os << "\"%f\\n\", ";
-            expression->generateCode(os);
-        } else {
-            os << "\"%d\\n\", ";
-            expression->generateCode(os);
+            tipo = DataType::FLOAT;
+        } else if (expression->type == NodeType::BOOL_LITERAL) {
+            tipo = DataType::BOOL;
         }
+        switch (tipo) {
+            case DataType::STRING:
+                os << "\"%s\\n\", ";
+                break;
+            case DataType::FLOAT:
+                os << "\"%f\\n\", ";
+                break;
+            case DataType::BOOL:
+                os << "\"%d\\n\", ";
+                break;
+            default:
+                os << "\"%d\\n\", ";
+        }
+        expression->generateCode(os);
     }
     os << ");\n";
 }

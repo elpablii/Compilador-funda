@@ -17,17 +17,26 @@ static DataType obtenerTipo(Node* node, TablaSimbolos& tabla, std::vector<Semant
         case NodeType::NUMBER_LITERAL: return DataType::INT;
         case NodeType::FLOAT_LITERAL:  return DataType::FLOAT;
         case NodeType::STRING_LITERAL: return DataType::STRING;
-        case NodeType::IDENTIFIER: {
-            auto* id = static_cast<IdentifierNode*>(node);
-            auto it = tabla.find(id->name);
-            if (it == tabla.end()) {
-                errores.push_back({"Variable no declarada: " + id->name, 0});
-                return DataType::VOID;
-            }
-            return it->second.tipo;
-        }
+        case NodeType::BOOL_LITERAL:   return DataType::BOOL;
         case NodeType::BINARY_OPERATION: {
             auto* bin = static_cast<BinaryOperationNode*>(node);
+            if (bin->op == "&&" || bin->op == "||") {
+                DataType izq = obtenerTipo(bin->left, tabla, errores);
+                DataType der = obtenerTipo(bin->right, tabla, errores);
+                if ((izq == DataType::BOOL || izq == DataType::INT) && (der == DataType::BOOL || der == DataType::INT))
+                    return DataType::BOOL;
+                errores.push_back({"Operación lógica entre tipos incompatibles", 0});
+                return DataType::VOID;
+            }
+            if (bin->op == "!") {
+                DataType izq = obtenerTipo(bin->left, tabla, errores);
+                if (izq == DataType::BOOL || izq == DataType::INT)
+                    return DataType::BOOL;
+                errores.push_back({"Negación lógica sobre tipo incompatible", 0});
+                return DataType::VOID;
+            }
+            if (bin->op == "==" || bin->op == "!=" || bin->op == "<" || bin->op == ">" || bin->op == "<=" || bin->op == ">=")
+                return DataType::BOOL;
             DataType izq = obtenerTipo(bin->left, tabla, errores);
             DataType der = obtenerTipo(bin->right, tabla, errores);
             if (izq == der) return izq;
@@ -37,7 +46,22 @@ static DataType obtenerTipo(Node* node, TablaSimbolos& tabla, std::vector<Semant
             errores.push_back({"Operación entre tipos incompatibles", 0});
             return DataType::VOID;
         }
-        default: return DataType::VOID;
+        case NodeType::IDENTIFIER: {
+            auto* id = static_cast<IdentifierNode*>(node);
+            auto it = tabla.find(id->name);
+            if (it == tabla.end()) {
+                errores.push_back({"Variable no declarada: " + id->name, 0});
+                return DataType::VOID;
+            }
+            return it->second.tipo;
+        }
+        case NodeType::UNARY_OPERATION: // Si tienes nodos unarios
+            // Implementar si es necesario
+            return DataType::VOID;
+        default:
+            // Soporte para literales booleanos
+            if (dynamic_cast<BoolLiteralNode*>(node)) return DataType::BOOL;
+            return DataType::VOID;
     }
 }
 
@@ -65,7 +89,11 @@ static void recorrerAST(Node* node, TablaSimbolos& tabla, std::vector<SemanticEr
             }
             if (decl->initialization) {
                 DataType tipoInit = obtenerTipo(decl->initialization, tabla, errores);
-                if (tipoInit != decl->varType && tipoInit != DataType::VOID) {
+                // Permitir asignación entre int y bool
+                if (!((decl->varType == tipoInit) ||
+                      (decl->varType == DataType::INT && tipoInit == DataType::BOOL) ||
+                      (decl->varType == DataType::BOOL && tipoInit == DataType::INT) ||
+                      tipoInit == DataType::VOID)) {
                     errores.push_back({"Inicialización de tipo incompatible para variable: " + nombre, 0});
                 }
             }
@@ -79,7 +107,11 @@ static void recorrerAST(Node* node, TablaSimbolos& tabla, std::vector<SemanticEr
                 errores.push_back({"Variable no declarada: " + nombre, 0});
             } else {
                 DataType tipoExpr = obtenerTipo(asig->expression, tabla, errores);
-                if (tipoExpr != it->second.tipo && tipoExpr != DataType::VOID) {
+                // Permitir asignación entre int y bool
+                if (!((it->second.tipo == tipoExpr) ||
+                      (it->second.tipo == DataType::INT && tipoExpr == DataType::BOOL) ||
+                      (it->second.tipo == DataType::BOOL && tipoExpr == DataType::INT) ||
+                      tipoExpr == DataType::VOID)) {
                     errores.push_back({"Asignación de tipo incompatible a variable: " + nombre, 0});
                 }
                 it->second.inicializada = true;
