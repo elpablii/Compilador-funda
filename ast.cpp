@@ -63,6 +63,7 @@ void NodoIdentificador::imprimir(std::ostream& os, int indent) const {
        << "NodoIdentificador: " << nombre << "\n";
 }
 
+// Imprime una operación binaria (como suma, resta, comparación)
 void NodoOperacionBinaria::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoOperacionBinaria: " << op << "\n";
@@ -82,6 +83,7 @@ void NodoOperacionBinaria::imprimir(std::ostream& os, int indent) const {
     }
 }
 
+// Imprime la declaración de una variable, su tipo, identificador e inicialización
 void NodoDeclaracionVariable::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoDeclaracionVariable: Tipo=" << tipoDatoAString(tipoVar) << "\n";
@@ -100,6 +102,7 @@ void NodoDeclaracionVariable::imprimir(std::ostream& os, int indent) const {
     }
 }
 
+// Imprime una asignación de variable
 void NodoAsignacion::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoAsignacion:\n";
@@ -115,6 +118,7 @@ void NodoAsignacion::imprimir(std::ostream& os, int indent) const {
     }
 }
 
+// Imprime una estructura condicional (if-else)
 void NodoSi::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoSi:\n";
@@ -138,6 +142,7 @@ void NodoSi::imprimir(std::ostream& os, int indent) const {
     }
 }
 
+// Imprime un bucle while
 void NodoMientras::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoMientras:\n";
@@ -153,6 +158,7 @@ void NodoMientras::imprimir(std::ostream& os, int indent) const {
     }
 }
 
+// Imprime una instrucción de impresión (print)
 void NodoImprimir::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoImprimir:\n";
@@ -163,6 +169,7 @@ void NodoImprimir::imprimir(std::ostream& os, int indent) const {
     }
 }
 
+// Imprime una instrucción de lectura (read)
 void NodoLeer::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoLeer:\n";
@@ -173,6 +180,7 @@ void NodoLeer::imprimir(std::ostream& os, int indent) const {
     }
 }
 
+// Imprime un literal booleano (true/false)
 void NodoLiteralBooleano::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
        << "NodoLiteralBooleano: " << (valor ? "true" : "false") << "\n";
@@ -193,36 +201,48 @@ void imprimirAST(const Nodo* raiz, std::ostream& os) {
 }
 
 // Implementación de generación de código para cada nodo
+
+// Genera el código C correspondiente al nodo raíz del programa.
+// Inserta los includes necesarios y la función principal main.
 void NodoPrograma::generarCodigo(std::ostream& os) const {
     os << "#include <stdio.h>\n";
+    os << "#ifdef _WIN32\n#include <windows.h>\n#endif\n";
     os << "int main() {\n";
+    os << "#ifdef _WIN32\n    SetConsoleOutputCP(CP_UTF8);\n#endif\n";
     if (listaInstrucciones) listaInstrucciones->generarCodigo(os);
     os << "    return 0;\n";
     os << "}\n";
 }
 
+// Genera el código C para cada instrucción contenida en la lista de instrucciones.
 void NodoListaInstrucciones::generarCodigo(std::ostream& os) const {
     for (const auto* instr : instrucciones) {
         if (instr) instr->generarCodigo(os);
     }
 }
 
+// Genera el código C para un literal entero.
 void NodoLiteralEntero::generarCodigo(std::ostream& os) const {
     os << valor;
 }
 
+// Genera el código C para un literal flotante.
 void NodoLiteralFlotante::generarCodigo(std::ostream& os) const {
     os << valor;
 }
 
+// Genera el código C para un literal de cadena.
 void NodoLiteralCadena::generarCodigo(std::ostream& os) const {
     os << '"' << valor << '"';
 }
 
+// Genera el código C para un identificador (nombre de variable).
 void NodoIdentificador::generarCodigo(std::ostream& os) const {
     os << nombre;
 }
 
+// Genera el código C para una operación binaria (aritmética, lógica, etc.).
+// Si la operación es negación lógica (!), solo utiliza el operando izquierdo.
 void NodoOperacionBinaria::generarCodigo(std::ostream& os) const {
     if (op == "!") {
         os << "(!";
@@ -237,6 +257,7 @@ void NodoOperacionBinaria::generarCodigo(std::ostream& os) const {
     os << ")";
 }
 
+// Genera el código C para la declaración de una variable, incluyendo su tipo y posible inicialización.
 void NodoDeclaracionVariable::generarCodigo(std::ostream& os) const {
     std::string tipo;
     switch (tipoVar) {
@@ -256,6 +277,7 @@ void NodoDeclaracionVariable::generarCodigo(std::ostream& os) const {
     os << ";\n";
 }
 
+// Genera el código C para una asignación de variable.
 void NodoAsignacion::generarCodigo(std::ostream& os) const {
     os << "    ";
     if (identificador) identificador->generarCodigo(os);
@@ -264,6 +286,7 @@ void NodoAsignacion::generarCodigo(std::ostream& os) const {
     os << ";\n";
 }
 
+// Genera el código C para una estructura condicional (if-else).
 void NodoSi::generarCodigo(std::ostream& os) const {
     os << "    if (";
     if (condicion) condicion->generarCodigo(os);
@@ -278,6 +301,7 @@ void NodoSi::generarCodigo(std::ostream& os) const {
     os << "\n";
 }
 
+// Genera el código C para un bucle while.
 void NodoMientras::generarCodigo(std::ostream& os) const {
     os << "    while (";
     if (condicion) condicion->generarCodigo(os);
@@ -286,6 +310,7 @@ void NodoMientras::generarCodigo(std::ostream& os) const {
     os << "    }\n";
 }
 
+// Genera el código C para una instrucción de impresión (printf), eligiendo el formato según el tipo de dato.
 void NodoImprimir::generarCodigo(std::ostream& os) const {
     os << "    printf(";
     if (expresion) {
@@ -319,6 +344,7 @@ void NodoImprimir::generarCodigo(std::ostream& os) const {
     os << ");\n";
 }
 
+// Genera el código C para una instrucción de lectura (scanf), asumiendo que la variable es de tipo entero.
 void NodoLeer::generarCodigo(std::ostream& os) const {
     os << "    scanf(\"%d\", &";
     if (identificador && identificador->tipo == TipoNodo::IDENTIFICADOR) {
@@ -328,10 +354,12 @@ void NodoLeer::generarCodigo(std::ostream& os) const {
 }
 
 // Implementación de utilidad global en español
+// Imprime el AST completo a partir de la raíz.
 void imprimirAST(Nodo* raiz, std::ostream& os) {
     if (raiz) raiz->imprimir(os);
 }
 
+// Genera el código C a partir del AST completo, comenzando desde la raíz.
 void generarCodigoDesdeAST(Nodo* raiz, std::ostream& os) {
     if (raiz) raiz->generarCodigo(os);
 }

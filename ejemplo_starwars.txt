@@ -3,12 +3,19 @@ c3p0 midiclorianos;
 deathStar mensaje;
 booleano ladoLuz;
 booleano ladoOscuro;
-
+r2d2 fuerzaDos;
 fuerza teOtorgamos 10;
 midiclorianos teOtorgamos 20.5;
 mensaje teOtorgamos "Que la fuerza te acompañe";
 ladoLuz teOtorgamos obiwan;
 ladoOscuro teOtorgamos anakin;
+
+// Imprimir todas las variables después de la inicialización
+palpatine(fuerza);
+palpatine(midiclorianos);
+palpatine(mensaje);
+palpatine(ladoLuz);
+palpatine(ladoOscuro);
 
 jedi (fuerza equilibrio 10) {
     palpatine("Eres un verdadero Jedi");
@@ -19,10 +26,16 @@ jedi (fuerza equilibrio 10) {
 cloneWar (fuerza highground 20) {
     fuerza teOtorgamos fuerza luz 1;
     palpatine("Entrenando con la fuerza...");
+    // Imprimir variable dentro del ciclo
+    palpatine(fuerza);
 }
+palpatine("Ingresa tu fuerza jedi");
+leia(fuerzaDos);
 
-leia(fuerza);
 
-jedi (ladoLuz) {
-    palpatine("El equilibrio está en la fuerza");
+jedi (fuerzaDos highground fuerza) {
+    palpatine("fuerzaDos wins");
+}
+sith {
+    palpatine("fuerzaDos loses");
 }

@@ -63,7 +63,6 @@ NUEVALINEA     \n
 "highground"              { printf("TOKEN: T_LT (%s)\n", yytext); return T_LT; }
 "youUnderestimateMyPower" { printf("TOKEN: T_GT (%s)\n", yytext); return T_GT; }
 
-"unknownRegion"           { printf("TOKEN: T_SEMICOLON (%s)\n", yytext); return T_SEMICOLON; }
 ";"                        { printf("TOKEN: T_SEMICOLON (%s)\n", yytext); return T_SEMICOLON; }
 
 "("                      { printf("TOKEN: T_LPAREN (%s)\n", yytext); return T_LPAREN; }
