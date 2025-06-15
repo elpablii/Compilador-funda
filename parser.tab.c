@@ -69,13 +69,13 @@
 /* First part of user prologue.  */
 #line 1 "parser.y"
 
-// parser.y (skeleton en C++ para Bison)
+// parser.y (esqueleto en C++ para Bison)
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>        // std::string
-#include "ast.hpp"       // definiciones de Node, DataType, etc.
+#include "ast.hpp"       // definiciones de Nodo, TipoDato, etc.
 
 // Prototipos de Flex/Bison
 extern int yylex();
@@ -83,10 +83,13 @@ extern int yylineno;
 extern char *yytext;
 extern FILE *yyin;
 
+// Variable global para el AST
+Nodo* raiz_ast = nullptr;
+
 // Función de error (se llama en errores sintácticos)
 void yyerror(const char *mensaje);
 
-#line 90 "parser.tab.c"
+#line 93 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -178,13 +181,6 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 
-/* Unqualified %code blocks.  */
-#line 78 "parser.y"
-
-    // ast_root guarda el AST generado
-    Node* ast_root = nullptr;
-
-#line 188 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -569,12 +565,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    86,    86,    94,    97,   107,   111,   115,   119,   123,
-     127,   131,   135,   139,   147,   155,   157,   159,   161,   166,
-     170,   177,   184,   188,   195,   202,   209,   216,   217,   218,
-     219,   223,   227,   231,   235,   239,   243,   247,   254,   258,
-     262,   269,   273,   277,   284,   291,   293,   295,   297,   299,
-     301,   305,   306,   310
+       0,    84,    84,    92,    95,   105,   109,   113,   117,   121,
+     125,   129,   133,   137,   145,   153,   155,   157,   159,   164,
+     168,   175,   182,   186,   193,   200,   207,   214,   215,   216,
+     217,   221,   225,   229,   233,   237,   241,   245,   252,   256,
+     260,   267,   271,   275,   282,   289,   291,   293,   295,   297,
+     299,   303,   304,   308
 };
 #endif
 
@@ -1202,397 +1198,397 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: statement_list  */
-#line 87 "parser.y"
+#line 85 "parser.y"
     {
-        ast_root = new ProgramNode((yyvsp[0].stmt_list_node));
+        raiz_ast = new NodoPrograma((yyvsp[0].nodo_lista_instr));
     }
-#line 1210 "parser.tab.c"
+#line 1206 "parser.tab.c"
     break;
 
   case 3: /* statement_list: %empty  */
-#line 94 "parser.y"
+#line 92 "parser.y"
     {
-        (yyval.stmt_list_node) = new StatementListNode();
+        (yyval.nodo_lista_instr) = new NodoListaInstrucciones();
     }
-#line 1218 "parser.tab.c"
+#line 1214 "parser.tab.c"
     break;
 
   case 4: /* statement_list: statement_list statement  */
-#line 98 "parser.y"
+#line 96 "parser.y"
     {
-        if ((yyvsp[0].node)) {
-            (yyvsp[-1].stmt_list_node)->statements.push_back((yyvsp[0].node));
+        if ((yyvsp[0].nodo)) {
+            (yyvsp[-1].nodo_lista_instr)->instrucciones.push_back((yyvsp[0].nodo));
         }
-        (yyval.stmt_list_node) = (yyvsp[-1].stmt_list_node);
+        (yyval.nodo_lista_instr) = (yyvsp[-1].nodo_lista_instr);
     }
-#line 1229 "parser.tab.c"
+#line 1225 "parser.tab.c"
     break;
 
   case 5: /* statement: variable_declaration  */
-#line 108 "parser.y"
+#line 106 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].var_decl_node);
+        (yyval.nodo) = (yyvsp[0].nodo_decl_var);
     }
-#line 1237 "parser.tab.c"
+#line 1233 "parser.tab.c"
     break;
 
   case 6: /* statement: assignment_statement  */
-#line 112 "parser.y"
+#line 110 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].assign_node);
+        (yyval.nodo) = (yyvsp[0].nodo_asig);
     }
-#line 1245 "parser.tab.c"
+#line 1241 "parser.tab.c"
     break;
 
   case 7: /* statement: if_statement  */
-#line 116 "parser.y"
+#line 114 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].if_node);
+        (yyval.nodo) = (yyvsp[0].nodo_si);
     }
-#line 1253 "parser.tab.c"
+#line 1249 "parser.tab.c"
     break;
 
   case 8: /* statement: while_statement  */
-#line 120 "parser.y"
+#line 118 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].while_node);
+        (yyval.nodo) = (yyvsp[0].nodo_mientras);
     }
-#line 1261 "parser.tab.c"
+#line 1257 "parser.tab.c"
     break;
 
   case 9: /* statement: print_statement  */
-#line 124 "parser.y"
+#line 122 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].print_node);
+        (yyval.nodo) = (yyvsp[0].nodo_imprimir);
     }
-#line 1269 "parser.tab.c"
+#line 1265 "parser.tab.c"
     break;
 
   case 10: /* statement: read_statement  */
-#line 128 "parser.y"
+#line 126 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].read_node);
+        (yyval.nodo) = (yyvsp[0].nodo_leer);
     }
-#line 1277 "parser.tab.c"
+#line 1273 "parser.tab.c"
     break;
 
   case 11: /* statement: block  */
-#line 132 "parser.y"
+#line 130 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].stmt_list_node);
+        (yyval.nodo) = (yyvsp[0].nodo_lista_instr);
     }
-#line 1285 "parser.tab.c"
+#line 1281 "parser.tab.c"
     break;
 
   case 12: /* statement: T_SEMICOLON  */
-#line 136 "parser.y"
+#line 134 "parser.y"
     {
-        (yyval.node) = nullptr;  // Instrucción vacía
+        (yyval.nodo) = nullptr;  // Instrucción vacía
     }
-#line 1293 "parser.tab.c"
+#line 1289 "parser.tab.c"
     break;
 
   case 13: /* statement: T_ERROR T_SEMICOLON  */
-#line 140 "parser.y"
+#line 138 "parser.y"
     {
         yyerrok;
-        (yyval.node) = nullptr;
+        (yyval.nodo) = nullptr;
     }
-#line 1302 "parser.tab.c"
+#line 1298 "parser.tab.c"
     break;
 
   case 14: /* block: T_LBRACE statement_list T_RBRACE  */
-#line 148 "parser.y"
+#line 146 "parser.y"
     {
-        (yyval.stmt_list_node) = (yyvsp[-1].stmt_list_node);
+        (yyval.nodo_lista_instr) = (yyvsp[-1].nodo_lista_instr);
     }
-#line 1310 "parser.tab.c"
+#line 1306 "parser.tab.c"
     break;
 
   case 15: /* type_specifier: T_INT  */
-#line 156 "parser.y"
-    { (yyval.dtype) = DataType::INT; }
-#line 1316 "parser.tab.c"
+#line 154 "parser.y"
+    { (yyval.tipo_dato) = TipoDato::ENTERO; }
+#line 1312 "parser.tab.c"
     break;
 
   case 16: /* type_specifier: T_FLOAT  */
-#line 158 "parser.y"
-    { (yyval.dtype) = DataType::FLOAT; }
-#line 1322 "parser.tab.c"
+#line 156 "parser.y"
+    { (yyval.tipo_dato) = TipoDato::FLOTANTE; }
+#line 1318 "parser.tab.c"
     break;
 
   case 17: /* type_specifier: T_STRING_TYPE  */
-#line 160 "parser.y"
-    { (yyval.dtype) = DataType::STRING; }
-#line 1328 "parser.tab.c"
+#line 158 "parser.y"
+    { (yyval.tipo_dato) = TipoDato::CADENA; }
+#line 1324 "parser.tab.c"
     break;
 
   case 18: /* type_specifier: T_BOOL  */
-#line 162 "parser.y"
-    { (yyval.dtype) = DataType::BOOL; }
-#line 1334 "parser.tab.c"
+#line 160 "parser.y"
+    { (yyval.tipo_dato) = TipoDato::BOOLEANO; }
+#line 1330 "parser.tab.c"
     break;
 
   case 19: /* variable_declaration: type_specifier identifier T_SEMICOLON  */
-#line 167 "parser.y"
+#line 165 "parser.y"
     {
-        (yyval.var_decl_node) = new VariableDeclarationNode((yyvsp[-2].dtype), (yyvsp[-1].id_node), nullptr);
+        (yyval.nodo_decl_var) = new NodoDeclaracionVariable((yyvsp[-2].tipo_dato), (yyvsp[-1].nodo_id), nullptr);
     }
-#line 1342 "parser.tab.c"
+#line 1338 "parser.tab.c"
     break;
 
   case 20: /* variable_declaration: type_specifier identifier T_ASSIGN expression T_SEMICOLON  */
-#line 171 "parser.y"
+#line 169 "parser.y"
     {
-        (yyval.var_decl_node) = new VariableDeclarationNode((yyvsp[-4].dtype), (yyvsp[-3].id_node), (yyvsp[-1].node));
+        (yyval.nodo_decl_var) = new NodoDeclaracionVariable((yyvsp[-4].tipo_dato), (yyvsp[-3].nodo_id), (yyvsp[-1].nodo));
     }
-#line 1350 "parser.tab.c"
+#line 1346 "parser.tab.c"
     break;
 
   case 21: /* assignment_statement: identifier T_ASSIGN expression T_SEMICOLON  */
-#line 178 "parser.y"
+#line 176 "parser.y"
     {
-        (yyval.assign_node) = new AssignmentNode((yyvsp[-3].id_node), (yyvsp[-1].node));
+        (yyval.nodo_asig) = new NodoAsignacion((yyvsp[-3].nodo_id), (yyvsp[-1].nodo));
     }
-#line 1358 "parser.tab.c"
+#line 1354 "parser.tab.c"
     break;
 
   case 22: /* if_statement: T_IF T_LPAREN expression T_RPAREN block  */
-#line 185 "parser.y"
+#line 183 "parser.y"
     {
-        (yyval.if_node) = new IfStatementNode((yyvsp[-2].node), (yyvsp[0].stmt_list_node), nullptr);
+        (yyval.nodo_si) = new NodoSi((yyvsp[-2].nodo), (yyvsp[0].nodo_lista_instr), nullptr);
     }
-#line 1366 "parser.tab.c"
+#line 1362 "parser.tab.c"
     break;
 
   case 23: /* if_statement: T_IF T_LPAREN expression T_RPAREN block T_ELSE block  */
-#line 189 "parser.y"
+#line 187 "parser.y"
     {
-        (yyval.if_node) = new IfStatementNode((yyvsp[-4].node), (yyvsp[-2].stmt_list_node), (yyvsp[0].stmt_list_node));
+        (yyval.nodo_si) = new NodoSi((yyvsp[-4].nodo), (yyvsp[-2].nodo_lista_instr), (yyvsp[0].nodo_lista_instr));
     }
-#line 1374 "parser.tab.c"
+#line 1370 "parser.tab.c"
     break;
 
   case 24: /* while_statement: T_WHILE T_LPAREN expression T_RPAREN block  */
-#line 196 "parser.y"
+#line 194 "parser.y"
     {
-        (yyval.while_node) = new WhileStatementNode((yyvsp[-2].node), (yyvsp[0].stmt_list_node));
+        (yyval.nodo_mientras) = new NodoMientras((yyvsp[-2].nodo), (yyvsp[0].nodo_lista_instr));
     }
-#line 1382 "parser.tab.c"
+#line 1378 "parser.tab.c"
     break;
 
   case 25: /* print_statement: T_PRINT T_LPAREN expression T_RPAREN T_SEMICOLON  */
-#line 203 "parser.y"
+#line 201 "parser.y"
     {
-        (yyval.print_node) = new PrintStatementNode((yyvsp[-2].node));
+        (yyval.nodo_imprimir) = new NodoImprimir((yyvsp[-2].nodo));
     }
-#line 1390 "parser.tab.c"
+#line 1386 "parser.tab.c"
     break;
 
   case 26: /* read_statement: T_READ T_LPAREN identifier T_RPAREN T_SEMICOLON  */
-#line 210 "parser.y"
+#line 208 "parser.y"
     {
-        (yyval.read_node) = new ReadStatementNode((yyvsp[-2].id_node));
+        (yyval.nodo_leer) = new NodoLeer((yyvsp[-2].nodo_id));
     }
-#line 1398 "parser.tab.c"
+#line 1394 "parser.tab.c"
     break;
 
   case 27: /* expression: expression T_AND expression  */
-#line 216 "parser.y"
-                                { (yyval.node) = new BinaryOperationNode("&&", (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1404 "parser.tab.c"
+#line 214 "parser.y"
+                                { (yyval.nodo) = new NodoOperacionBinaria("&&", (yyvsp[-2].nodo), (yyvsp[0].nodo)); }
+#line 1400 "parser.tab.c"
     break;
 
   case 28: /* expression: expression T_OR expression  */
-#line 217 "parser.y"
-                               { (yyval.node) = new BinaryOperationNode("||", (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1410 "parser.tab.c"
+#line 215 "parser.y"
+                               { (yyval.nodo) = new NodoOperacionBinaria("||", (yyvsp[-2].nodo), (yyvsp[0].nodo)); }
+#line 1406 "parser.tab.c"
     break;
 
   case 29: /* expression: T_NOT expression  */
-#line 218 "parser.y"
-                               { (yyval.node) = new BinaryOperationNode("!", (yyvsp[0].node), nullptr); }
-#line 1416 "parser.tab.c"
+#line 216 "parser.y"
+                               { (yyval.nodo) = new NodoOperacionBinaria("!", (yyvsp[0].nodo), nullptr); }
+#line 1412 "parser.tab.c"
     break;
 
   case 30: /* expression: comparison_expression  */
-#line 219 "parser.y"
-                              { (yyval.node) = (yyvsp[0].node); }
-#line 1422 "parser.tab.c"
+#line 217 "parser.y"
+                              { (yyval.nodo) = (yyvsp[0].nodo); }
+#line 1418 "parser.tab.c"
     break;
 
   case 31: /* comparison_expression: arithmetic_expression  */
-#line 224 "parser.y"
+#line 222 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].node);
+        (yyval.nodo) = (yyvsp[0].nodo);
     }
-#line 1430 "parser.tab.c"
+#line 1426 "parser.tab.c"
     break;
 
   case 32: /* comparison_expression: arithmetic_expression T_EQ arithmetic_expression  */
-#line 228 "parser.y"
+#line 226 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("==", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("==", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1438 "parser.tab.c"
+#line 1434 "parser.tab.c"
     break;
 
   case 33: /* comparison_expression: arithmetic_expression T_NEQ arithmetic_expression  */
-#line 232 "parser.y"
+#line 230 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("!=", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("!=", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1446 "parser.tab.c"
+#line 1442 "parser.tab.c"
     break;
 
   case 34: /* comparison_expression: arithmetic_expression T_LT arithmetic_expression  */
-#line 236 "parser.y"
+#line 234 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("<", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("<", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1454 "parser.tab.c"
+#line 1450 "parser.tab.c"
     break;
 
   case 35: /* comparison_expression: arithmetic_expression T_GT arithmetic_expression  */
-#line 240 "parser.y"
+#line 238 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode(">", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria(">", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1462 "parser.tab.c"
+#line 1458 "parser.tab.c"
     break;
 
   case 36: /* comparison_expression: arithmetic_expression T_LTE arithmetic_expression  */
-#line 244 "parser.y"
+#line 242 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("<=", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("<=", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1470 "parser.tab.c"
+#line 1466 "parser.tab.c"
     break;
 
   case 37: /* comparison_expression: arithmetic_expression T_GTE arithmetic_expression  */
-#line 248 "parser.y"
+#line 246 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode(">=", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria(">=", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1478 "parser.tab.c"
+#line 1474 "parser.tab.c"
     break;
 
   case 38: /* arithmetic_expression: term  */
-#line 255 "parser.y"
+#line 253 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].node);
+        (yyval.nodo) = (yyvsp[0].nodo);
     }
-#line 1486 "parser.tab.c"
+#line 1482 "parser.tab.c"
     break;
 
   case 39: /* arithmetic_expression: arithmetic_expression T_PLUS term  */
-#line 259 "parser.y"
+#line 257 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("+", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("+", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1494 "parser.tab.c"
+#line 1490 "parser.tab.c"
     break;
 
   case 40: /* arithmetic_expression: arithmetic_expression T_MINUS term  */
-#line 263 "parser.y"
+#line 261 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("-", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("-", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1502 "parser.tab.c"
+#line 1498 "parser.tab.c"
     break;
 
   case 41: /* term: factor  */
-#line 270 "parser.y"
+#line 268 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].node);
+        (yyval.nodo) = (yyvsp[0].nodo);
     }
-#line 1510 "parser.tab.c"
+#line 1506 "parser.tab.c"
     break;
 
   case 42: /* term: term T_MULTIPLY factor  */
-#line 274 "parser.y"
+#line 272 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("*", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("*", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1518 "parser.tab.c"
+#line 1514 "parser.tab.c"
     break;
 
   case 43: /* term: term T_DIVIDE factor  */
-#line 278 "parser.y"
+#line 276 "parser.y"
     {
-        (yyval.node) = new BinaryOperationNode("/", (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.nodo) = new NodoOperacionBinaria("/", (yyvsp[-2].nodo), (yyvsp[0].nodo));
     }
-#line 1526 "parser.tab.c"
+#line 1522 "parser.tab.c"
     break;
 
   case 44: /* factor: primary_expression  */
-#line 285 "parser.y"
+#line 283 "parser.y"
     {
-        (yyval.node) = (yyvsp[0].node);
+        (yyval.nodo) = (yyvsp[0].nodo);
     }
-#line 1534 "parser.tab.c"
+#line 1530 "parser.tab.c"
     break;
 
   case 45: /* primary_expression: identifier  */
-#line 292 "parser.y"
-    { (yyval.node) = (yyvsp[0].id_node); }
-#line 1540 "parser.tab.c"
+#line 290 "parser.y"
+    { (yyval.nodo) = (yyvsp[0].nodo_id); }
+#line 1536 "parser.tab.c"
     break;
 
   case 46: /* primary_expression: T_INTEGER_LITERAL  */
-#line 294 "parser.y"
-    { (yyval.node) = new NumberLiteralNode((yyvsp[0].ival)); }
-#line 1546 "parser.tab.c"
+#line 292 "parser.y"
+    { (yyval.nodo) = new NodoLiteralEntero((yyvsp[0].ival)); }
+#line 1542 "parser.tab.c"
     break;
 
   case 47: /* primary_expression: T_FLOAT_LITERAL  */
-#line 296 "parser.y"
-    { (yyval.node) = new FloatLiteralNode((yyvsp[0].fval)); }
-#line 1552 "parser.tab.c"
+#line 294 "parser.y"
+    { (yyval.nodo) = new NodoLiteralFlotante((yyvsp[0].fval)); }
+#line 1548 "parser.tab.c"
     break;
 
   case 48: /* primary_expression: T_STRING_LITERAL  */
-#line 298 "parser.y"
-    { std::string cad((yyvsp[0].sval)); free((yyvsp[0].sval)); (yyval.node) = new StringLiteralNode(cad); }
-#line 1558 "parser.tab.c"
+#line 296 "parser.y"
+    { std::string cad((yyvsp[0].sval)); free((yyvsp[0].sval)); (yyval.nodo) = new NodoLiteralCadena(cad); }
+#line 1554 "parser.tab.c"
     break;
 
   case 49: /* primary_expression: bool_literal  */
-#line 300 "parser.y"
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1564 "parser.tab.c"
+#line 298 "parser.y"
+    { (yyval.nodo) = (yyvsp[0].nodo); }
+#line 1560 "parser.tab.c"
     break;
 
   case 50: /* primary_expression: T_LPAREN expression T_RPAREN  */
-#line 302 "parser.y"
-    { (yyval.node) = (yyvsp[-1].node); }
-#line 1570 "parser.tab.c"
+#line 300 "parser.y"
+    { (yyval.nodo) = (yyvsp[-1].nodo); }
+#line 1566 "parser.tab.c"
     break;
 
   case 51: /* bool_literal: T_TRUE  */
-#line 305 "parser.y"
-              { (yyval.node) = new BoolLiteralNode(true); }
-#line 1576 "parser.tab.c"
+#line 303 "parser.y"
+              { (yyval.nodo) = new NodoLiteralBooleano(true); }
+#line 1572 "parser.tab.c"
     break;
 
   case 52: /* bool_literal: T_FALSE  */
-#line 306 "parser.y"
-              { (yyval.node) = new BoolLiteralNode(false); }
-#line 1582 "parser.tab.c"
+#line 304 "parser.y"
+              { (yyval.nodo) = new NodoLiteralBooleano(false); }
+#line 1578 "parser.tab.c"
     break;
 
   case 53: /* identifier: T_IDENTIFIER  */
-#line 311 "parser.y"
+#line 309 "parser.y"
     {
         std::string nombre((yyvsp[0].sval));
         free((yyvsp[0].sval));
-        (yyval.id_node) = new IdentifierNode(nombre);
+        (yyval.nodo_id) = new NodoIdentificador(nombre);
     }
-#line 1592 "parser.tab.c"
+#line 1588 "parser.tab.c"
     break;
 
 
-#line 1596 "parser.tab.c"
+#line 1592 "parser.tab.c"
 
       default: break;
     }
@@ -1785,7 +1781,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 318 "parser.y"
+#line 316 "parser.y"
 
 
 void yyerror(const char *mensaje) {

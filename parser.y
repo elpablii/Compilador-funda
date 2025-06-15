@@ -1,17 +1,20 @@
 %{
-// parser.y (skeleton en C++ para Bison)
+// parser.y (esqueleto en C++ para Bison)
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>        // std::string
-#include "ast.hpp"       // definiciones de Node, DataType, etc.
+#include "ast.hpp"       // definiciones de Nodo, TipoDato, etc.
 
 // Prototipos de Flex/Bison
 extern int yylex();
 extern int yylineno;
 extern char *yytext;
 extern FILE *yyin;
+
+// Variable global para el AST
+Nodo* raiz_ast = nullptr;
 
 // Función de error (se llama en errores sintácticos)
 void yyerror(const char *mensaje);
@@ -23,20 +26,20 @@ void yyerror(const char *mensaje);
 }
 
 %union {
-    Node*                     node;
-    StatementListNode*        stmt_list_node;
-    IdentifierNode*           id_node;
-    VariableDeclarationNode*  var_decl_node;
-    AssignmentNode*           assign_node;
-    IfStatementNode*          if_node;
-    WhileStatementNode*       while_node;
-    PrintStatementNode*       print_node;
-    ReadStatementNode*        read_node;
+    Nodo*                     nodo;
+    NodoListaInstrucciones*   nodo_lista_instr;
+    NodoIdentificador*        nodo_id;
+    NodoDeclaracionVariable*  nodo_decl_var;
+    NodoAsignacion*           nodo_asig;
+    NodoSi*                   nodo_si;
+    NodoMientras*             nodo_mientras;
+    NodoImprimir*             nodo_imprimir;
+    NodoLeer*                 nodo_leer;
 
     char*   sval;
     int     ival;
     float   fval;
-    DataType dtype;
+    TipoDato tipo_dato;
 }
 
 /* Definición de tokens personalizados Star Wars */
@@ -56,17 +59,17 @@ void yyerror(const char *mensaje);
 %token T_AND T_OR T_NOT
 
 /* Tipos para no-terminales */
-%type <node> program statement expression arithmetic_expression term factor primary_expression comparison_expression
-%type <stmt_list_node> statement_list block
-%type <id_node> identifier
-%type <var_decl_node> variable_declaration
-%type <assign_node> assignment_statement
-%type <if_node> if_statement
-%type <while_node> while_statement
-%type <print_node> print_statement
-%type <read_node> read_statement
-%type <dtype> type_specifier
-%type <node> bool_literal
+%type <nodo> program statement expression arithmetic_expression term factor primary_expression comparison_expression
+%type <nodo_lista_instr> statement_list block
+%type <nodo_id> identifier
+%type <nodo_decl_var> variable_declaration
+%type <nodo_asig> assignment_statement
+%type <nodo_si> if_statement
+%type <nodo_mientras> while_statement
+%type <nodo_imprimir> print_statement
+%type <nodo_leer> read_statement
+%type <tipo_dato> type_specifier
+%type <nodo> bool_literal
 
 /* Precedencia de operadores */
 %left T_EQ T_NEQ
@@ -75,29 +78,24 @@ void yyerror(const char *mensaje);
 %left T_MULTIPLY T_DIVIDE
 %right T_ASSIGN
 
-%code {
-    // ast_root guarda el AST generado
-    Node* ast_root = nullptr;
-}
-
 %%
 
 program:
     statement_list
     {
-        ast_root = new ProgramNode($1);
+        raiz_ast = new NodoPrograma($1);
     }
 ;
 
 statement_list:
       /* vacío */
     {
-        $$ = new StatementListNode();
+        $$ = new NodoListaInstrucciones();
     }
   | statement_list statement
     {
         if ($2) {
-            $1->statements.push_back($2);
+            $1->instrucciones.push_back($2);
         }
         $$ = $1;
     }
@@ -153,69 +151,69 @@ block:
 /* Especificador de tipos */
 type_specifier:
       T_INT
-    { $$ = DataType::INT; }
+    { $$ = TipoDato::ENTERO; }
   | T_FLOAT
-    { $$ = DataType::FLOAT; }
+    { $$ = TipoDato::FLOTANTE; }
   | T_STRING_TYPE
-    { $$ = DataType::STRING; }
+    { $$ = TipoDato::CADENA; }
   | T_BOOL
-    { $$ = DataType::BOOL; }
+    { $$ = TipoDato::BOOLEANO; }
 ;
 
 variable_declaration:
       type_specifier identifier T_SEMICOLON
     {
-        $$ = new VariableDeclarationNode($1, $2, nullptr);
+        $$ = new NodoDeclaracionVariable($1, $2, nullptr);
     }
   | type_specifier identifier T_ASSIGN expression T_SEMICOLON
     {
-        $$ = new VariableDeclarationNode($1, $2, $4);
+        $$ = new NodoDeclaracionVariable($1, $2, $4);
     }
 ;
 
 assignment_statement:
     identifier T_ASSIGN expression T_SEMICOLON
     {
-        $$ = new AssignmentNode($1, $3);
+        $$ = new NodoAsignacion($1, $3);
     }
 ;
 
 if_statement:
       T_IF T_LPAREN expression T_RPAREN block
     {
-        $$ = new IfStatementNode($3, $5, nullptr);
+        $$ = new NodoSi($3, $5, nullptr);
     }
   | T_IF T_LPAREN expression T_RPAREN block T_ELSE block
     {
-        $$ = new IfStatementNode($3, $5, $7);
+        $$ = new NodoSi($3, $5, $7);
     }
 ;
 
 while_statement:
     T_WHILE T_LPAREN expression T_RPAREN block
     {
-        $$ = new WhileStatementNode($3, $5);
+        $$ = new NodoMientras($3, $5);
     }
 ;
 
 print_statement:
     T_PRINT T_LPAREN expression T_RPAREN T_SEMICOLON
     {
-        $$ = new PrintStatementNode($3);
+        $$ = new NodoImprimir($3);
     }
 ;
 
 read_statement:
     T_READ T_LPAREN identifier T_RPAREN T_SEMICOLON
     {
-        $$ = new ReadStatementNode($3);
+        $$ = new NodoLeer($3);
     }
 ;
 
 expression:
-    expression T_AND expression { $$ = new BinaryOperationNode("&&", $1, $3); }
-  | expression T_OR expression { $$ = new BinaryOperationNode("||", $1, $3); }
-  | T_NOT expression           { $$ = new BinaryOperationNode("!", $2, nullptr); }
+    expression T_AND expression { $$ = new NodoOperacionBinaria("&&", $1, $3); }
+  | expression T_OR expression { $$ = new NodoOperacionBinaria("||", $1, $3); }
+  | T_NOT expression           { $$ = new NodoOperacionBinaria("!", $2, nullptr); }
   | comparison_expression     { $$ = $1; }
 ;
 
@@ -226,27 +224,27 @@ comparison_expression:
     }
   | arithmetic_expression T_EQ arithmetic_expression
     {
-        $$ = new BinaryOperationNode("==", $1, $3);
+        $$ = new NodoOperacionBinaria("==", $1, $3);
     }
   | arithmetic_expression T_NEQ arithmetic_expression
     {
-        $$ = new BinaryOperationNode("!=", $1, $3);
+        $$ = new NodoOperacionBinaria("!=", $1, $3);
     }
   | arithmetic_expression T_LT arithmetic_expression
     {
-        $$ = new BinaryOperationNode("<", $1, $3);
+        $$ = new NodoOperacionBinaria("<", $1, $3);
     }
   | arithmetic_expression T_GT arithmetic_expression
     {
-        $$ = new BinaryOperationNode(">", $1, $3);
+        $$ = new NodoOperacionBinaria(">", $1, $3);
     }
   | arithmetic_expression T_LTE arithmetic_expression
     {
-        $$ = new BinaryOperationNode("<=", $1, $3);
+        $$ = new NodoOperacionBinaria("<=", $1, $3);
     }
   | arithmetic_expression T_GTE arithmetic_expression
     {
-        $$ = new BinaryOperationNode(">=", $1, $3);
+        $$ = new NodoOperacionBinaria(">=", $1, $3);
     }
 ;
 
@@ -257,11 +255,11 @@ arithmetic_expression:
     }
   | arithmetic_expression T_PLUS term
     {
-        $$ = new BinaryOperationNode("+", $1, $3);
+        $$ = new NodoOperacionBinaria("+", $1, $3);
     }
   | arithmetic_expression T_MINUS term
     {
-        $$ = new BinaryOperationNode("-", $1, $3);
+        $$ = new NodoOperacionBinaria("-", $1, $3);
     }
 ;
 
@@ -272,11 +270,11 @@ term:
     }
   | term T_MULTIPLY factor
     {
-        $$ = new BinaryOperationNode("*", $1, $3);
+        $$ = new NodoOperacionBinaria("*", $1, $3);
     }
   | term T_DIVIDE factor
     {
-        $$ = new BinaryOperationNode("/", $1, $3);
+        $$ = new NodoOperacionBinaria("/", $1, $3);
     }
 ;
 
@@ -291,19 +289,19 @@ primary_expression:
       identifier
     { $$ = $1; }
   | T_INTEGER_LITERAL
-    { $$ = new NumberLiteralNode($1); }
+    { $$ = new NodoLiteralEntero($1); }
   | T_FLOAT_LITERAL
-    { $$ = new FloatLiteralNode($1); }
+    { $$ = new NodoLiteralFlotante($1); }
   | T_STRING_LITERAL
-    { std::string cad($1); free($1); $$ = new StringLiteralNode(cad); }
+    { std::string cad($1); free($1); $$ = new NodoLiteralCadena(cad); }
   | bool_literal
     { $$ = $1; }
   | T_LPAREN expression T_RPAREN
     { $$ = $2; }
 ;
 bool_literal:
-      T_TRUE  { $$ = new BoolLiteralNode(true); }
-    | T_FALSE { $$ = new BoolLiteralNode(false); }
+      T_TRUE  { $$ = new NodoLiteralBooleano(true); }
+    | T_FALSE { $$ = new NodoLiteralBooleano(false); }
 ;
 
 identifier:
@@ -311,7 +309,7 @@ identifier:
     {
         std::string nombre($1);
         free($1);
-        $$ = new IdentifierNode(nombre);
+        $$ = new NodoIdentificador(nombre);
     }
 ;
 

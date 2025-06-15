@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 21 "parser.y"
+#line 24 "parser.y"
 
     #include "ast.hpp"
 
@@ -104,22 +104,22 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 25 "parser.y"
+#line 28 "parser.y"
 
-    Node*                     node;
-    StatementListNode*        stmt_list_node;
-    IdentifierNode*           id_node;
-    VariableDeclarationNode*  var_decl_node;
-    AssignmentNode*           assign_node;
-    IfStatementNode*          if_node;
-    WhileStatementNode*       while_node;
-    PrintStatementNode*       print_node;
-    ReadStatementNode*        read_node;
+    Nodo*                     nodo;
+    NodoListaInstrucciones*   nodo_lista_instr;
+    NodoIdentificador*        nodo_id;
+    NodoDeclaracionVariable*  nodo_decl_var;
+    NodoAsignacion*           nodo_asig;
+    NodoSi*                   nodo_si;
+    NodoMientras*             nodo_mientras;
+    NodoImprimir*             nodo_imprimir;
+    NodoLeer*                 nodo_leer;
 
     char*   sval;
     int     ival;
     float   fval;
-    DataType dtype;
+    TipoDato tipo_dato;
 
 #line 125 "parser.tab.h"
 

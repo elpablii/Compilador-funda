@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <vector>
 
-struct SemanticError {
+struct ErrorSemantico {
     std::string mensaje;
     int linea;
 };
 
-bool analizarSemantica(Node* root, std::vector<SemanticError>& errores);
+bool analizarSemantica(Nodo* raiz, std::vector<ErrorSemantico>& errores);

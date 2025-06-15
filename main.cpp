@@ -3,13 +3,13 @@
 
 #include <cstdio>    // FILE, fopen, fclose, perror, stdin, printf
 #include <iostream>  // std::cout
-#include "ast.hpp"   // Node, printAST
+#include "ast.hpp"   // Nodo, imprimirAST
 #include <sstream>   // std::ostringstream
 #include "semantic.hpp"
 
 // Variables y funciones externas (definidas en Flex/Bison o en parser.y)
 extern FILE* yyin;         // Archivo de entrada para Flex/Bison
-extern Node* ast_root;     // Raíz del AST (poblada por Bison)
+extern Nodo* raiz_ast;     // Raíz del AST (poblada por Bison)
 extern int yyparse(void);  // Función de análisis sintáctico generada por Bison
 
 int main(int argc, char** argv) {
@@ -49,32 +49,32 @@ int main(int argc, char** argv) {
     if (resultado == 0) {
         std::printf("Análisis sintáctico completado exitosamente.\n");
 
-        if (ast_root) {
-            std::vector<SemanticError> errores;
-            if (!analizarSemantica(ast_root, errores)) {
+        if (raiz_ast) {
+            std::vector<ErrorSemantico> errores;
+            if (!analizarSemantica(raiz_ast, errores)) {
                 std::printf("\nErrores semánticos detectados:\n");
                 for (const auto& err : errores)
                     std::printf("  - %s\n", err.mensaje.c_str());
-                delete ast_root;
-                ast_root = nullptr;
+                delete raiz_ast;
+                raiz_ast = nullptr;
                 return 2;
             }
             std::printf("\n--- Árbol de Sintaxis Abstracta (AST) ---\n");
-            printAST(ast_root, std::cout);
+            imprimirAST(raiz_ast, std::cout);
             // Generar código C en un archivo
             FILE* fout = fopen("output.c", "w");
             if (fout) {
                 std::fprintf(fout, "// Código generado por el compilador\n");
                 std::ostringstream oss;
-                generateCodeFromAST(ast_root, oss);
+                generarCodigoDesdeAST(raiz_ast, oss);
                 std::fprintf(fout, "%s", oss.str().c_str());
                 fclose(fout);
                 std::printf("\nCódigo C generado en output.c\n");
             } else {
                 std::printf("No se pudo abrir output.c para escritura.\n");
             }
-            delete ast_root;      // Liberar memoria del AST
-            ast_root = nullptr;
+            delete raiz_ast;      // Liberar memoria del AST
+            raiz_ast = nullptr;
         } else {
             std::printf(
                 "No se generó ningún AST "
@@ -88,9 +88,9 @@ int main(int argc, char** argv) {
             resultado
         );
         // En caso de haber construido parcialmente el AST, liberarlo
-        if (ast_root) {
-            delete ast_root;
-            ast_root = nullptr;
+        if (raiz_ast) {
+            delete raiz_ast;
+            raiz_ast = nullptr;
         }
     }
 

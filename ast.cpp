@@ -5,322 +5,333 @@
 #include <iostream>
 #include <unordered_map>
 
-// Función auxiliar para convertir DataType a cadena
-std::string tipoDatoAString(DataType dt) {
+// Función auxiliar para convertir TipoDato a cadena
+// Devuelve el nombre textual del tipo de dato
+std::string tipoDatoAString(TipoDato dt) {
     switch (dt) {
-        case DataType::INT:    return "INT";
-        case DataType::FLOAT:  return "FLOAT";
-        case DataType::STRING: return "STRING";
-        case DataType::BOOL:   return "BOOL";
-        case DataType::VOID:   return "VOID";
-        default:               return "UNKNOWN_TYPE";
+        case TipoDato::ENTERO:    return "ENTERO";
+        case TipoDato::FLOTANTE:  return "FLOTANTE";
+        case TipoDato::CADENA:    return "CADENA";
+        case TipoDato::BOOLEANO:  return "BOOLEANO";
+        case TipoDato::VACIO:     return "VACIO";
+        default:                  return "TIPO_DESCONOCIDO";
     }
 }
 
-void ProgramNode::print(std::ostream& os, int indent) const {
-    os << std::string(indent, ' ') << "ProgramNode:\n";
-    if (statementList) {
-        statementList->print(os, indent + 2);
+// Imprime el nodo raíz del programa y su lista de instrucciones
+void NodoPrograma::imprimir(std::ostream& os, int indent) const {
+    os << std::string(indent, ' ') << "NodoPrograma:\n";
+    if (listaInstrucciones) {
+        listaInstrucciones->imprimir(os, indent + 2);
     }
 }
 
-void StatementListNode::print(std::ostream& os, int indent) const {
-    os << std::string(indent, ' ') << "StatementListNode:\n";
-    for (const auto* stmt : statements) {
-        if (stmt) {
-            stmt->print(os, indent + 2);
+// Imprime la lista de instrucciones contenidas en el programa
+void NodoListaInstrucciones::imprimir(std::ostream& os, int indent) const {
+    os << std::string(indent, ' ') << "NodoListaInstrucciones:\n";
+    for (const auto* instr : instrucciones) {
+        if (instr) {
+            instr->imprimir(os, indent + 2);
         } else {
             os << std::string(indent + 2, ' ')
-               << "NullStatementNode (instrucción vacía)\n";
+               << "NodoInstruccionNula (instrucción vacía)\n";
         }
     }
 }
 
-void NumberLiteralNode::print(std::ostream& os, int indent) const {
+// Imprime un nodo literal entero
+void NodoLiteralEntero::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "NumberLiteralNode: " << value << "\n";
+       << "NodoLiteralEntero: " << valor << "\n";
 }
 
-void FloatLiteralNode::print(std::ostream& os, int indent) const {
+// Imprime un nodo literal flotante
+void NodoLiteralFlotante::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "FloatLiteralNode: " << value << "\n";
+       << "NodoLiteralFlotante: " << valor << "\n";
 }
 
-void StringLiteralNode::print(std::ostream& os, int indent) const {
+// Imprime un nodo literal de cadena
+void NodoLiteralCadena::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "StringLiteralNode: \"" << value << "\"\n";
+       << "NodoLiteralCadena: \"" << valor << "\"\n";
 }
 
-void IdentifierNode::print(std::ostream& os, int indent) const {
+// Imprime un nodo identificador (nombre de variable)
+void NodoIdentificador::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "IdentifierNode: " << name << "\n";
+       << "NodoIdentificador: " << nombre << "\n";
 }
 
-void BinaryOperationNode::print(std::ostream& os, int indent) const {
+void NodoOperacionBinaria::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "BinaryOperationNode: " << op << "\n";
-    if (left) {
-        os << std::string(indent + 2, ' ') << "Left:\n";
-        left->print(os, indent + 4);
+       << "NodoOperacionBinaria: " << op << "\n";
+    if (izquierda) {
+        os << std::string(indent + 2, ' ') << "Izquierda:\n";
+        izquierda->imprimir(os, indent + 4);
     } else {
         os << std::string(indent + 2, ' ')
-           << "Left: (null)\n";
+           << "Izquierda: (null)\n";
     }
-    if (right) {
-        os << std::string(indent + 2, ' ') << "Right:\n";
-        right->print(os, indent + 4);
+    if (derecha) {
+        os << std::string(indent + 2, ' ') << "Derecha:\n";
+        derecha->imprimir(os, indent + 4);
     } else {
         os << std::string(indent + 2, ' ')
-           << "Right: (null)\n";
+           << "Derecha: (null)\n";
     }
 }
 
-void VariableDeclarationNode::print(std::ostream& os, int indent) const {
+void NodoDeclaracionVariable::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "VariableDeclarationNode: Type=" << tipoDatoAString(varType) << "\n";
-    if (identifier) {
+       << "NodoDeclaracionVariable: Tipo=" << tipoDatoAString(tipoVar) << "\n";
+    if (identificador) {
         os << std::string(indent + 2, ' ')
-           << "Identifier:\n";
-        identifier->print(os, indent + 4);
+           << "Identificador:\n";
+        identificador->imprimir(os, indent + 4);
     }
-    if (initialization) {
+    if (inicializacion) {
         os << std::string(indent + 2, ' ')
-           << "Initialization:\n";
-        initialization->print(os, indent + 4);
+           << "Inicializacion:\n";
+        inicializacion->imprimir(os, indent + 4);
     } else {
         os << std::string(indent + 2, ' ')
-           << "Initialization: (none)\n";
+           << "Inicializacion: (none)\n";
     }
 }
 
-void AssignmentNode::print(std::ostream& os, int indent) const {
+void NodoAsignacion::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "AssignmentNode:\n";
-    if (identifier) {
+       << "NodoAsignacion:\n";
+    if (identificador) {
         os << std::string(indent + 2, ' ')
-           << "Identifier:\n";
-        identifier->print(os, indent + 4);
+           << "Identificador:\n";
+        identificador->imprimir(os, indent + 4);
     }
-    if (expression) {
+    if (expresion) {
         os << std::string(indent + 2, ' ')
-           << "Expression:\n";
-        expression->print(os, indent + 4);
+           << "Expresion:\n";
+        expresion->imprimir(os, indent + 4);
     }
 }
 
-void IfStatementNode::print(std::ostream& os, int indent) const {
+void NodoSi::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "IfStatementNode:\n";
-    if (condition) {
+       << "NodoSi:\n";
+    if (condicion) {
         os << std::string(indent + 2, ' ')
-           << "Condition:\n";
-        condition->print(os, indent + 4);
+           << "Condicion:\n";
+        condicion->imprimir(os, indent + 4);
     }
-    if (thenBranch) {
+    if (entonces) {
         os << std::string(indent + 2, ' ')
-           << "ThenBranch:\n";
-        thenBranch->print(os, indent + 4);
+           << "Entonces:\n";
+        entonces->imprimir(os, indent + 4);
     }
-    if (elseBranch) {
+    if (sino) {
         os << std::string(indent + 2, ' ')
-           << "ElseBranch:\n";
-        elseBranch->print(os, indent + 4);
+           << "Sino:\n";
+        sino->imprimir(os, indent + 4);
     } else {
         os << std::string(indent + 2, ' ')
-           << "ElseBranch: (none)\n";
+           << "Sino: (none)\n";
     }
 }
 
-void WhileStatementNode::print(std::ostream& os, int indent) const {
+void NodoMientras::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "WhileStatementNode:\n";
-    if (condition) {
+       << "NodoMientras:\n";
+    if (condicion) {
         os << std::string(indent + 2, ' ')
-           << "Condition:\n";
-        condition->print(os, indent + 4);
+           << "Condicion:\n";
+        condicion->imprimir(os, indent + 4);
     }
-    if (body) {
+    if (cuerpo) {
         os << std::string(indent + 2, ' ')
-           << "Body:\n";
-        body->print(os, indent + 4);
+           << "Cuerpo:\n";
+        cuerpo->imprimir(os, indent + 4);
     }
 }
 
-void PrintStatementNode::print(std::ostream& os, int indent) const {
+void NodoImprimir::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "PrintStatementNode:\n";
-    if (expression) {
+       << "NodoImprimir:\n";
+    if (expresion) {
         os << std::string(indent + 2, ' ')
-           << "Expression:\n";
-        expression->print(os, indent + 4);
+           << "Expresion:\n";
+        expresion->imprimir(os, indent + 4);
     }
 }
 
-void ReadStatementNode::print(std::ostream& os, int indent) const {
+void NodoLeer::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "ReadStatementNode:\n";
-    if (identifier) {
+       << "NodoLeer:\n";
+    if (identificador) {
         os << std::string(indent + 2, ' ')
-           << "TargetIdentifier:\n";
-        identifier->print(os, indent + 4);
+           << "IdentificadorObjetivo:\n";
+        identificador->imprimir(os, indent + 4);
     }
 }
 
-void BoolLiteralNode::print(std::ostream& os, int indent) const {
+void NodoLiteralBooleano::imprimir(std::ostream& os, int indent) const {
     os << std::string(indent, ' ')
-       << "BoolLiteralNode: " << (value ? "true" : "false") << "\n";
+       << "NodoLiteralBooleano: " << (valor ? "true" : "false") << "\n";
 }
-void BoolLiteralNode::generateCode(std::ostream& os) const {
-    os << (value ? "1" : "0");
+void NodoLiteralBooleano::generarCodigo(std::ostream& os) const {
+    os << (valor ? "1" : "0");
 }
 
-std::unordered_map<std::string, DataType> variableTypes;
+std::unordered_map<std::string, TipoDato> tiposVariables;
 
 // Función global para imprimir el AST completo
-void printAST(const Node* root, std::ostream& os) {
-    if (root) {
-        root->print(os, 0);
+void imprimirAST(const Nodo* raiz, std::ostream& os) {
+    if (raiz) {
+        raiz->imprimir(os, 0);
     } else {
         os << "AST está vacío (raíz nula).\n";
     }
 }
 
 // Implementación de generación de código para cada nodo
-void ProgramNode::generateCode(std::ostream& os) const {
+void NodoPrograma::generarCodigo(std::ostream& os) const {
     os << "#include <stdio.h>\n";
     os << "int main() {\n";
-    if (statementList) statementList->generateCode(os);
+    if (listaInstrucciones) listaInstrucciones->generarCodigo(os);
     os << "    return 0;\n";
     os << "}\n";
 }
 
-void StatementListNode::generateCode(std::ostream& os) const {
-    for (const auto* stmt : statements) {
-        if (stmt) stmt->generateCode(os);
+void NodoListaInstrucciones::generarCodigo(std::ostream& os) const {
+    for (const auto* instr : instrucciones) {
+        if (instr) instr->generarCodigo(os);
     }
 }
 
-void NumberLiteralNode::generateCode(std::ostream& os) const {
-    os << value;
+void NodoLiteralEntero::generarCodigo(std::ostream& os) const {
+    os << valor;
 }
 
-void FloatLiteralNode::generateCode(std::ostream& os) const {
-    os << value;
+void NodoLiteralFlotante::generarCodigo(std::ostream& os) const {
+    os << valor;
 }
 
-void StringLiteralNode::generateCode(std::ostream& os) const {
-    os << '"' << value << '"';
+void NodoLiteralCadena::generarCodigo(std::ostream& os) const {
+    os << '"' << valor << '"';
 }
 
-void IdentifierNode::generateCode(std::ostream& os) const {
-    os << name;
+void NodoIdentificador::generarCodigo(std::ostream& os) const {
+    os << nombre;
 }
 
-void BinaryOperationNode::generateCode(std::ostream& os) const {
+void NodoOperacionBinaria::generarCodigo(std::ostream& os) const {
     if (op == "!") {
         os << "(!";
-        if (left) left->generateCode(os);
+        if (izquierda) izquierda->generarCodigo(os);
         os << ")";
         return;
     }
     os << "(";
-    if (left) left->generateCode(os);
+    if (izquierda) izquierda->generarCodigo(os);
     os << " " << op << " ";
-    if (right) right->generateCode(os);
+    if (derecha) derecha->generarCodigo(os);
     os << ")";
 }
 
-void VariableDeclarationNode::generateCode(std::ostream& os) const {
+void NodoDeclaracionVariable::generarCodigo(std::ostream& os) const {
     std::string tipo;
-    switch (varType) {
-        case DataType::INT: tipo = "int"; break;
-        case DataType::FLOAT: tipo = "float"; break;
-        case DataType::STRING: tipo = "char*"; break;
-        case DataType::BOOL: tipo = "int"; break; // Representar booleanos como int en C
+    switch (tipoVar) {
+        case TipoDato::ENTERO: tipo = "int"; break;
+        case TipoDato::FLOTANTE: tipo = "float"; break;
+        case TipoDato::CADENA: tipo = "char*"; break;
+        case TipoDato::BOOLEANO: tipo = "int"; break; // Representar booleanos como int en C
         default: tipo = "int"; break;
     }
-    if (identifier) variableTypes[identifier->name] = varType;
+    if (identificador) tiposVariables[identificador->nombre] = tipoVar;
     os << "    " << tipo << " ";
-    if (identifier) identifier->generateCode(os);
-    if (initialization) {
+    if (identificador) identificador->generarCodigo(os);
+    if (inicializacion) {
         os << " = ";
-        initialization->generateCode(os);
+        inicializacion->generarCodigo(os);
     }
     os << ";\n";
 }
 
-void AssignmentNode::generateCode(std::ostream& os) const {
+void NodoAsignacion::generarCodigo(std::ostream& os) const {
     os << "    ";
-    if (identifier) identifier->generateCode(os);
+    if (identificador) identificador->generarCodigo(os);
     os << " = ";
-    if (expression) expression->generateCode(os);
+    if (expresion) expresion->generarCodigo(os);
     os << ";\n";
 }
 
-void IfStatementNode::generateCode(std::ostream& os) const {
+void NodoSi::generarCodigo(std::ostream& os) const {
     os << "    if (";
-    if (condition) condition->generateCode(os);
+    if (condicion) condicion->generarCodigo(os);
     os << ") {\n";
-    if (thenBranch) thenBranch->generateCode(os);
+    if (entonces) entonces->generarCodigo(os);
     os << "    }";
-    if (elseBranch) {
+    if (sino) {
         os << " else {\n";
-        elseBranch->generateCode(os);
+        sino->generarCodigo(os);
         os << "    }";
     }
     os << "\n";
 }
 
-void WhileStatementNode::generateCode(std::ostream& os) const {
+void NodoMientras::generarCodigo(std::ostream& os) const {
     os << "    while (";
-    if (condition) condition->generateCode(os);
+    if (condicion) condicion->generarCodigo(os);
     os << ") {\n";
-    if (body) body->generateCode(os);
+    if (cuerpo) cuerpo->generarCodigo(os);
     os << "    }\n";
 }
 
-void PrintStatementNode::generateCode(std::ostream& os) const {
+void NodoImprimir::generarCodigo(std::ostream& os) const {
     os << "    printf(";
-    if (expression) {
-        DataType tipo = DataType::INT;
-        if (expression->type == NodeType::IDENTIFIER) {
-            auto* id = static_cast<const IdentifierNode*>(expression);
-            auto it = variableTypes.find(id->name);
-            if (it != variableTypes.end()) tipo = it->second;
-        } else if (expression->type == NodeType::STRING_LITERAL) {
-            tipo = DataType::STRING;
-        } else if (expression->type == NodeType::FLOAT_LITERAL) {
-            tipo = DataType::FLOAT;
-        } else if (expression->type == NodeType::BOOL_LITERAL) {
-            tipo = DataType::BOOL;
+    if (expresion) {
+        TipoDato tipo = TipoDato::ENTERO;
+        if (expresion->tipo == TipoNodo::IDENTIFICADOR) {
+            auto* id = static_cast<const NodoIdentificador*>(expresion);
+            auto it = tiposVariables.find(id->nombre);
+            if (it != tiposVariables.end()) tipo = it->second;
+        } else if (expresion->tipo == TipoNodo::LITERAL_CADENA) {
+            tipo = TipoDato::CADENA;
+        } else if (expresion->tipo == TipoNodo::LITERAL_FLOTANTE) {
+            tipo = TipoDato::FLOTANTE;
+        } else if (expresion->tipo == TipoNodo::LITERAL_BOOLEANO) {
+            tipo = TipoDato::BOOLEANO;
         }
         switch (tipo) {
-            case DataType::STRING:
+            case TipoDato::CADENA:
                 os << "\"%s\\n\", ";
                 break;
-            case DataType::FLOAT:
+            case TipoDato::FLOTANTE:
                 os << "\"%f\\n\", ";
                 break;
-            case DataType::BOOL:
+            case TipoDato::BOOLEANO:
                 os << "\"%d\\n\", ";
                 break;
             default:
                 os << "\"%d\\n\", ";
         }
-        expression->generateCode(os);
+        expresion->generarCodigo(os);
     }
     os << ");\n";
 }
 
-void ReadStatementNode::generateCode(std::ostream& os) const {
+void NodoLeer::generarCodigo(std::ostream& os) const {
     os << "    scanf(\"%d\", &";
-    if (identifier && identifier->type == NodeType::IDENTIFIER) {
-        identifier->generateCode(os);
+    if (identificador && identificador->tipo == TipoNodo::IDENTIFICADOR) {
+        identificador->generarCodigo(os);
     }
     os << ");\n";
 }
 
-void generateCodeFromAST(const Node* root, std::ostream& os) {
-    if (root) root->generateCode(os);
-    else os << "// AST vacío, no se generó código.\n";
+// Implementación de utilidad global en español
+void imprimirAST(Nodo* raiz, std::ostream& os) {
+    if (raiz) raiz->imprimir(os);
+}
+
+void generarCodigoDesdeAST(Nodo* raiz, std::ostream& os) {
+    if (raiz) raiz->generarCodigo(os);
 }

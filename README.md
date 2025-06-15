@@ -3,11 +3,11 @@
 ¡Bienvenido a tu compilador temático de Star Wars! Este proyecto implementa un compilador para un lenguaje propio, usando Flex, Bison y C++. Todas las palabras clave y tokens están inspirados en el universo de Star Wars, haciendo el aprendizaje de compiladores mucho más divertido.
 
 ## Características principales
-- **Tokens temáticos**: Palabras clave como `r2d2` (int), `c3p0` (float), `jedi` (if), `sith` (else), `obiwan` (true), `anakin` (false), y muchas más.
+- **Tokens temáticos**: Palabras clave como `r2d2` (entero), `c3p0` (flotante), `jedi` (if), `sith` (else), `obiwan` (verdadero), `anakin` (falso), y muchas más.
 - **Declaración de variables**: enteros, flotantes, cadenas y booleanos.
 - **Operaciones aritméticas y lógicas**: suma (`luz`), resta (`oscuridad`), multiplicación (`unlimitedPower`), división (`lightsable`), y operadores lógicos.
 - **Sentencias de control**: `jedi` (if), `sith` (else), `cloneWar` (while), `stormTroopers` (for).
-- **Entrada/salida**: `palpatine` (print), `leia` (read).
+- **Entrada/salida**: `palpatine` (imprimir), `leia` (leer).
 - **Generación de código C estándar**.
 
 ## Ejemplo de código Star Wars

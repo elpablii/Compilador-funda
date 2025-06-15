@@ -6,43 +6,23 @@ int main() {
     char* mensaje;
     int ladoLuz;
     int ladoOscuro;
-    printf("%s\n", "--- Prueba de asignación e impresión ---");
-    fuerza = 5;
-    printf("%d\n", fuerza);
-    midiclorianos = 3.14;
-    printf("%f\n", midiclorianos);
-    mensaje = "Hola desde la galaxia";
-    printf("%s\n", mensaje);
-    printf("%s\n", "--- Prueba de operaciones matemáticas ---");
-    fuerza = (fuerza + 10);
-    printf("%d\n", fuerza);
-    fuerza = (fuerza - 2);
-    printf("%d\n", fuerza);
-    fuerza = (fuerza * 3);
-    printf("%d\n", fuerza);
-    fuerza = (fuerza / 2);
-    printf("%d\n", fuerza);
-    printf("%s\n", "--- Prueba de input ---");
-    printf("%s\n", "Introduce un valor para fuerza:");
-    scanf("%d", &fuerza);
-    printf("%d\n", fuerza);
-    printf("%s\n", "--- Prueba de lógica y condicionales ---");
+    fuerza = 10;
+    midiclorianos = 20.5;
+    mensaje = "Que la fuerza te acompañe";
     ladoLuz = 1;
     ladoOscuro = 0;
     if ((fuerza == 10)) {
-    printf("%s\n", "La fuerza está equilibrada");
+    printf("%s\n", "Eres un verdadero Jedi");
     } else {
-    printf("%s\n", "La fuerza NO está equilibrada");
+    printf("%s\n", "Aún eres un padawan");
     }
-    if (ladoLuz) {
-    printf("%s\n", "El lado luminoso prevalece");
-    } else {
-    printf("%s\n", "El lado oscuro prevalece");
-    }
-    printf("%s\n", "--- Prueba de ciclo while ---");
-    while ((fuerza < 10)) {
-    printf("%d\n", fuerza);
+    while ((fuerza < 20)) {
     fuerza = (fuerza + 1);
+    printf("%s\n", "Entrenando con la fuerza...");
+    }
+    scanf("%d", &fuerza);
+    if (ladoLuz) {
+    printf("%s\n", "El equilibrio está en la fuerza");
     }
     return 0;
 }
