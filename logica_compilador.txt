@@ -1,0 +1,87 @@
+// Calculadora Star Wars con menú interactivo (corregido)
+r2d2 opcion;
+r2d2 a;
+r2d2 b;
+r2d2 resultado;
+r2d2 base;
+r2d2 exponente;
+r2d2 potencia;
+
+opcion teOtorgamos 0;
+
+cloneWar (opcion rebelde 6) {
+    palpatine("\n=== CALCULADORA STAR WARS ===");
+    palpatine("1. Suma");
+    palpatine("2. Resta");
+    palpatine("3. Multiplicación");
+    palpatine("4. División");
+    palpatine("5. Potencia");
+    palpatine("6. Salir");
+    palpatine("Elige una opción (1-6):");
+    leia(opcion);
+
+    jedi (opcion equilibrio 1) {
+        palpatine("[SUMA] Ingresa el primer número:");
+        leia(a);
+        palpatine("[SUMA] Ingresa el segundo número:");
+        leia(b);
+        resultado teOtorgamos a luz b;
+        palpatine("Resultado de la suma:");
+        palpatine(resultado);
+    } sith {
+        jedi (opcion equilibrio 2) {
+            palpatine("[RESTA] Ingresa el primer número:");
+            leia(a);
+            palpatine("[RESTA] Ingresa el segundo número:");
+            leia(b);
+            resultado teOtorgamos a oscuridad b;
+            palpatine("Resultado de la resta:");
+            palpatine(resultado);
+        } sith {
+            jedi (opcion equilibrio 3) {
+                palpatine("[MULTIPLICACIÓN] Ingresa el primer número:");
+                leia(a);
+                palpatine("[MULTIPLICACIÓN] Ingresa el segundo número:");
+                leia(b);
+                resultado teOtorgamos a unlimitedPower b;
+                palpatine("Resultado de la multiplicación:");
+                palpatine(resultado);
+            } sith {
+                jedi (opcion equilibrio 4) {
+                    palpatine("[DIVISIÓN] Ingresa el numerador:");
+                    leia(a);
+                    palpatine("[DIVISIÓN] Ingresa el denominador:");
+                    leia(b);
+                    jedi (b rebelde 0) {
+                        resultado teOtorgamos a lightsable b;
+                        palpatine("Resultado de la división:");
+                        palpatine(resultado);
+                    } sith {
+                        palpatine("No se puede dividir entre 0");
+                    }
+                } sith {
+                    jedi (opcion equilibrio 5) {
+                        palpatine("[POTENCIA] Ingresa la base:");
+                        leia(base);
+                        palpatine("[POTENCIA] Ingresa el exponente:");
+                        leia(exponente);
+                        potencia teOtorgamos 1;
+                        resultado teOtorgamos 0;
+                        cloneWar (resultado highground exponente) {
+                            potencia teOtorgamos potencia unlimitedPower base;
+                            resultado teOtorgamos resultado luz 1;
+                        }
+                        palpatine("Resultado de la potencia:");
+                        palpatine(potencia);
+                    } sith {
+                        jedi (opcion equilibrio 6) {
+                            palpatine("¡Hasta pronto, que la fuerza te acompañe!");
+                        } sith {
+                            palpatine("Opción no válida. Intenta de nuevo.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
