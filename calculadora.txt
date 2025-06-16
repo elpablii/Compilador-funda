@@ -39,14 +39,17 @@ teInvoco r2d2 main() {
     r2d2 exponente;
     opcion teOtorgamos 0;
     cloneWar (opcion rebelde 6) {
-        palpatine("\n=== CALCULADORA STAR WARS ===");
-        palpatine("1. Suma");
-        palpatine("2. Resta");
-        palpatine("3. Multiplicación");
-        palpatine("4. División");
-        palpatine("5. Potencia");
-        palpatine("6. Salir");
-        palpatine("Elige una opción (1-6):");
+        palpatine("\n==============================\n");
+        palpatine("   CALCULADORA STAR WARS   \n");
+        palpatine("==============================\n");
+        palpatine("  1. Suma\n");
+        palpatine("  2. Resta\n");
+        palpatine("  3. Multiplicación\n");
+        palpatine("  4. División\n");
+        palpatine("  5. Potencia\n");
+        palpatine("  6. Salir\n");
+        palpatine("------------------------------\n");
+        palpatine("Elige una opción (1-6): ");
         leia(opcion);
         jedi (opcion equilibrio 1) {
             palpatine("[SUMA] Ingresa el primer número:");

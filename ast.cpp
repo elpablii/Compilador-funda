@@ -206,11 +206,45 @@ void imprimirAST(const Nodo* raiz, std::ostream& os) {
 void NodoPrograma::generarCodigo(std::ostream& os) const {
     os << "#include <stdio.h>\n";
     os << "#ifdef _WIN32\n#include <windows.h>\n#endif\n";
-    os << "int main() {\n";
-    os << "#ifdef _WIN32\n    SetConsoleOutputCP(CP_UTF8);\n#endif\n";
-    if (listaInstrucciones) listaInstrucciones->generarCodigo(os);
-    os << "    return 0;\n";
-    os << "}\n";
+    // Buscar si el usuario definió una función main
+    bool tieneMainUsuario = false;
+    if (listaInstrucciones) {
+        for (const auto* instr : listaInstrucciones->instrucciones) {
+            auto* fun = dynamic_cast<const NodoFuncion*>(instr);
+            if (fun && fun->nombre && fun->nombre->nombre == "main") {
+                tieneMainUsuario = true;
+                break;
+            }
+        }
+    }
+    // Generar todas las funciones primero
+    if (listaInstrucciones) {
+        for (const auto* instr : listaInstrucciones->instrucciones) {
+            auto* fun = dynamic_cast<const NodoFuncion*>(instr);
+            if (fun) fun->generarCodigo(os);
+        }
+    }
+    // Si el usuario NO definió main, generar uno por defecto
+    if (!tieneMainUsuario) {
+        os << "int main() {\n";
+        os << "#ifdef _WIN32\n    SetConsoleOutputCP(CP_UTF8);\n#endif\n";
+        if (listaInstrucciones) {
+            for (const auto* instr : listaInstrucciones->instrucciones) {
+                auto* fun = dynamic_cast<const NodoFuncion*>(instr);
+                if (!fun && instr) instr->generarCodigo(os);
+            }
+        }
+        os << "    return 0;\n";
+        os << "}\n";
+    } else {
+        // Si el usuario definió main, solo generar instrucciones globales no-función (si existen)
+        if (listaInstrucciones) {
+            for (const auto* instr : listaInstrucciones->instrucciones) {
+                auto* fun = dynamic_cast<const NodoFuncion*>(instr);
+                if (!fun && instr) instr->generarCodigo(os);
+            }
+        }
+    }
 }
 
 // Genera el código C para cada instrucción contenida en la lista de instrucciones.
@@ -312,10 +346,17 @@ void NodoMientras::generarCodigo(std::ostream& os) const {
 // Genera el código C para una instrucción de impresión (printf), eligiendo el formato según el tipo de dato.
 void NodoImprimir::generarCodigo(std::ostream& os) const {
     if (!expresiones || expresiones->empty()) return;
-    // Si el primer argumento es cadena, usar como formato
     auto* litCad = dynamic_cast<NodoLiteralCadena*>((*expresiones)[0]);
     if (litCad) {
-        os << "    printf(\"" << litCad->valor << "\"";
+        os << "    printf(\"" << litCad->valor;
+        // Si hay más argumentos, agregar %d por cada uno
+        if (expresiones->size() > 1) {
+            for (size_t i = 1; i < expresiones->size(); ++i) {
+                os << " %d";
+            }
+            os << "\\n";
+        }
+        os << "\"";
         for (size_t i = 1; i < expresiones->size(); ++i) {
             os << ", ";
             (*expresiones)[i]->generarCodigo(os);

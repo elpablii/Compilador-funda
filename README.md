@@ -6,20 +6,23 @@
 - **Tokens temáticos**: Palabras clave como `r2d2` (entero), `c3p0` (flotante), `jedi` (if), `sith` (else), `obiwan` (verdadero), `anakin` (falso), y muchas más.
 - **Declaración de variables**: enteros, flotantes, cadenas y booleanos.
 - **Operaciones aritméticas y lógicas**: suma (`luz`), resta (`oscuridad`), multiplicación (`unlimitedPower`), división (`lightsable`), y operadores lógicos.
-- **Sentencias de control**: `jedi` (if), `sith` (else), `cloneWar` (while), `stormTroopers` (for).
-- **Entrada/salida**: `palpatine` (imprimir), `leia` (leer).
+- **Sentencias de control**: `jedi` (if), `sith` (else), `cloneWar` (while).
+- **Funciones**: Definición con `teInvoco`, parámetros, return y llamadas a funciones.
+- **Entrada/salida**: `palpatine` (imprimir, acepta múltiples argumentos), `leia` (leer).
 - **Generación de código C estándar**.
 
 ## Ejemplo de código Star Wars
 ```c
-r2d2 luke;
-c3p0 fuerza;
-booleano ladoOscuro;
-luke teOtorgamos 5 unknownRegion
-fuerza teOtorgamos 2.5 unknownRegion
-ladoOscuro teOtorgamos obiwan unknownRegion
-jedi (ladoOscuro) {
-    palpatine("¡La fuerza te acompaña, Luke!") unknownRegion
+teInvoco r2d2 suma(r2d2 a, r2d2 b) {
+    return a luz b;
+}
+
+teInvoco r2d2 main() {
+    r2d2 x teOtorgamos 5;
+    r2d2 y teOtorgamos 7;
+    r2d2 z teOtorgamos suma(x, y);
+    palpatine("Suma:", z);
+    return 0;
 }
 ```
 
@@ -31,17 +34,16 @@ jedi (ladoOscuro) {
    ```
 2. Compila el compilador:
    ```sh
-   make clean
-   make
+   wsl make clean; wsl make
    ```
 3. Usa el compilador con un archivo de ejemplo:
    ```sh
-   ./mycompiler ejemplo_starwars.txt
+   wsl ./mycompiler ejemplo_funciones.txt
    ```
 4. Compila y ejecuta el código C generado:
    ```sh
-   gcc output.c -o programa
-   ./programa
+   wsl gcc output.c -o programa
+   wsl ./programa
    ```
 
 ## Manual de uso: ¿Cómo programar en el Lenguaje Star Wars?
@@ -61,12 +63,12 @@ booleano fuerza;
 ```
 
 ### 2. Asignación de valores
-Utiliza `teOtorgamos` para asignar valores y termina cada instrucción con `unknownRegion` o `;`.
+Utiliza `teOtorgamos` para asignar valores y termina cada instrucción con `;`.
 ```c
-vidas teOtorgamos 3 unknownRegion
-energia teOtorgamos 99.9 unknownRegion
-mensaje teOtorgamos "¡Bienvenido, Jedi!" unknownRegion
-fuerza teOtorgamos obiwan unknownRegion
+vidas teOtorgamos 3;
+energia teOtorgamos 99.9;
+mensaje teOtorgamos "¡Bienvenido, Jedi!";
+fuerza teOtorgamos obiwan;
 ```
 
 ### 3. Operadores y expresiones
@@ -83,10 +85,29 @@ fuerza teOtorgamos obiwan unknownRegion
 
 Ejemplo:
 ```c
-vidas teOtorgamos vidas luz 1 unknownRegion
+vidas teOtorgamos vidas luz 1;
 ```
 
-### 4. Sentencias de control
+### 4. Funciones y return
+- Declaración: `teInvoco tipo nombre(parámetros) { ... }`
+- Parámetros separados por coma, pueden ser de cualquier tipo Star Wars.
+- Retorna un valor con `return valor;`.
+- Llama funciones como `resultado teOtorgamos suma(x, y);`
+
+Ejemplo:
+```c
+teInvoco r2d2 suma(r2d2 a, r2d2 b) {
+    return a luz b;
+}
+```
+
+### 5. Llamada a funciones
+Puedes llamar funciones en cualquier expresión:
+```c
+r2d2 total teOtorgamos suma(3, 4);
+```
+
+### 6. Sentencias de control
 - If: `jedi (condición) { ... }`
 - Else: `sith { ... }`
 - While: `cloneWar (condición) { ... }`
@@ -94,27 +115,37 @@ vidas teOtorgamos vidas luz 1 unknownRegion
 Ejemplo:
 ```c
 jedi (fuerza) {
-    palpatine("¡La fuerza está contigo!") unknownRegion
+    palpatine("¡La fuerza está contigo!");
 } sith {
-    palpatine("¡Únete al lado luminoso!") unknownRegion
+    palpatine("¡Únete al lado luminoso!");
 }
 ```
 
-### 5. Entrada y salida
-- Imprimir: `palpatine("mensaje") unknownRegion`
-- Leer: `leia(variable) unknownRegion`
+### 7. Entrada y salida
+- Imprimir: `palpatine("mensaje", var1, var2, ...);` (puedes imprimir varios valores)
+- Leer: `leia(variable);`
 
-### 6. Booleanos
+Ejemplo:
+```c
+palpatine("Resultado:", total);
+```
+
+### 8. Booleanos
 - Verdadero: `obiwan`
 - Falso: `anakin`
 
-### 7. Comentarios
+### 9. Comentarios
 - Comentario de línea: `// Esto es un comentario`
 - Comentario de bloque: `/* Esto es un comentario largo */`
 
 ---
 
 ¡Con estos comandos puedes crear tus propios programas en el lenguaje Star Wars! Consulta los ejemplos incluidos para más inspiración.
+
+## Manuales y ejemplos
+- Consulta `MANUAL_EJECUCION.md` para instrucciones detalladas de compilación y ejecución.
+- Consulta `MANUAL_STARWARS.md` para la referencia completa del lenguaje.
+- Ejemplos: `ejemplo_funciones.txt`, `logica_compilador.txt`, `ejemplo_starwars.txt`.
 
 ## Créditos
 Desarrollado por el equipo de compiladores. ¡Que la fuerza te acompañe!
