@@ -17,12 +17,12 @@ booleano fuerza;
 ```
 
 ## 2. Asignación de valores
-Utiliza `teOtorgamos` para asignar valores y termina cada instrucción con `unknownRegion` o `;`.
+Utiliza `teOtorgamos` para asignar valores y termina cada instrucción con `;`.
 ```c
-vidas teOtorgamos 3 unknownRegion
-energia teOtorgamos 99.9 unknownRegion
-mensaje teOtorgamos "¡Bienvenido, Jedi!" unknownRegion
-fuerza teOtorgamos obiwan unknownRegion
+vidas teOtorgamos 3;
+energia teOtorgamos 99.9;
+mensaje teOtorgamos "¡Bienvenido, Jedi!";
+fuerza teOtorgamos obiwan;
 ```
 
 ## 3. Operadores y expresiones
@@ -39,10 +39,31 @@ fuerza teOtorgamos obiwan unknownRegion
 
 Ejemplo:
 ```c
-vidas teOtorgamos vidas luz 1 unknownRegion
+vidas teOtorgamos vidas luz 1;
 ```
 
-## 4. Sentencias de control
+## 4. Funciones y return
+- Declaración: `teInvoco tipo nombre(parámetros) { ... }`
+- Parámetros separados por coma, pueden ser de cualquier tipo Star Wars.
+- Retorna un valor con `return valor;`.
+- Llama funciones como `resultado teOtorgamos suma(x, y);`
+
+Ejemplo:
+```c
+teInvoco r2d2 suma(r2d2 a, r2d2 b) {
+    r2d2 resultado;
+    resultado teOtorgamos a luz b;
+    return resultado;
+}
+```
+
+## 5. Llamada a funciones
+Puedes llamar funciones en cualquier expresión:
+```c
+r2d2 total teOtorgamos suma(3, 4);
+```
+
+## 6. Sentencias de control
 - If: `jedi (condición) { ... }`
 - Else: `sith { ... }`
 - While: `cloneWar (condición) { ... }`
@@ -50,21 +71,26 @@ vidas teOtorgamos vidas luz 1 unknownRegion
 Ejemplo:
 ```c
 jedi (fuerza) {
-    palpatine("¡La fuerza está contigo!") unknownRegion
+    palpatine("¡La fuerza está contigo!");
 } sith {
-    palpatine("¡Únete al lado luminoso!") unknownRegion
+    palpatine("¡Únete al lado luminoso!");
 }
 ```
 
-## 5. Entrada y salida
-- Imprimir: `palpatine("mensaje") unknownRegion`
-- Leer: `leia(variable) unknownRegion`
+## 7. Entrada y salida
+- Imprimir: `palpatine("mensaje", var1, var2, ...);` (puedes imprimir varios valores)
+- Leer: `leia(variable);`
 
-## 6. Booleanos
+Ejemplo:
+```c
+palpatine("Resultado:", total);
+```
+
+## 8. Booleanos
 - Verdadero: `obiwan`
 - Falso: `anakin`
 
-## 7. Comentarios
+## 9. Comentarios
 - Comentario de línea: `// Esto es un comentario`
 - Comentario de bloque: `/* Esto es un comentario largo */`
 

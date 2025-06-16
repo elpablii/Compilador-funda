@@ -134,7 +134,11 @@ static void recorrerAST(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSeman
         }
         case TipoNodo::INSTRUCCION_IMPRIMIR: {
             auto* pr = static_cast<NodoImprimir*>(nodo);
-            recorrerAST(pr->expresion, tabla, errores);
+            if (pr->expresiones) {
+                for (auto* e : *pr->expresiones) {
+                    recorrerAST(e, tabla, errores);
+                }
+            }
             break;
         }
         case TipoNodo::INSTRUCCION_LEER: {
@@ -142,6 +146,33 @@ static void recorrerAST(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSeman
             std::string nombre = rd->identificador->nombre;
             if (!tabla.count(nombre)) {
                 errores.push_back({"Variable no declarada para leer: " + nombre, 0});
+            }
+            break;
+        }
+        case TipoNodo::FUNCION: {
+            auto* fun = static_cast<NodoFuncion*>(nodo);
+            // Nuevo ámbito para parámetros
+            TablaSimbolos tablaLocal = tabla;
+            if (fun->parametros) {
+                for (auto* p : *fun->parametros) {
+                    std::string nombre = p->identificador->nombre;
+                    tablaLocal[nombre] = {p->tipoVar, true};
+                }
+            }
+            recorrerAST(fun->cuerpo, tablaLocal, errores);
+            break;
+        }
+        case TipoNodo::RETURN: {
+            auto* ret = static_cast<NodoReturn*>(nodo);
+            if (ret->valor) obtenerTipo(ret->valor, tabla, errores);
+            break;
+        }
+        case TipoNodo::LLAMADA_FUNCION: {
+            auto* call = static_cast<NodoLlamadaFuncion*>(nodo);
+            if (call->argumentos) {
+                for (auto* arg : *call->argumentos) {
+                    if (arg) obtenerTipo(arg, tabla, errores);
+                }
             }
             break;
         }

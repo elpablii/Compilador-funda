@@ -25,7 +25,10 @@ enum class TipoNodo {
     LITERAL_FLOTANTE,
     LITERAL_CADENA,
     LITERAL_BOOLEANO,         // Nuevo tipo de nodo para booleanos
-    IDENTIFICADOR
+    IDENTIFICADOR,
+    FUNCION,
+    RETURN,
+    LLAMADA_FUNCION          // Nuevo tipo de nodo para llamadas a funciones
 };
 
 // Enumeración para los tipos de datos del lenguaje
@@ -300,16 +303,19 @@ struct NodoMientras : public Nodo {
 // Nodo para imprimir
 // ----------------------------------------------------------------------------
 struct NodoImprimir : public Nodo {
-    Nodo* expresion;
+    std::vector<Nodo*>* expresiones;
 
-    explicit NodoImprimir(Nodo* expr)
+    explicit NodoImprimir(std::vector<Nodo*>* exprs)
         : Nodo(TipoNodo::INSTRUCCION_IMPRIMIR),
-          expresion(expr)
+          expresiones(exprs)
     {}
 
     ~NodoImprimir() override {
-        if (expresion) {
-            delete expresion;
+        if (expresiones) {
+            for (auto* e : *expresiones) {
+                delete e;
+            }
+            delete expresiones;
         }
     }
 
@@ -346,6 +352,81 @@ struct NodoLiteralBooleano : public Nodo {
 
     explicit NodoLiteralBooleano(bool v)
         : Nodo(TipoNodo::LITERAL_BOOLEANO), valor(v) {}
+
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
+};
+
+// ----------------------------------------------------------------------------
+// Nodo para funciones
+// ----------------------------------------------------------------------------
+struct NodoFuncion : public Nodo {
+    TipoDato tipoRetorno;
+    NodoIdentificador* nombre;
+    std::vector<NodoDeclaracionVariable*>* parametros;
+    Nodo* cuerpo;
+
+    NodoFuncion(TipoDato t, NodoIdentificador* n, std::vector<NodoDeclaracionVariable*>* p, Nodo* c)
+        : Nodo(TipoNodo::FUNCION),
+          tipoRetorno(t),
+          nombre(n),
+          parametros(p),
+          cuerpo(c)
+    {}
+
+    ~NodoFuncion() override {
+        delete nombre;
+        if (parametros) {
+            for (auto* p : *parametros) {
+                delete p;
+            }
+            delete parametros;
+        }
+        delete cuerpo;
+    }
+
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
+};
+
+// ----------------------------------------------------------------------------
+// Nodo para return
+// ----------------------------------------------------------------------------
+struct NodoReturn : public Nodo {
+    Nodo* valor;
+
+    explicit NodoReturn(Nodo* v)
+        : Nodo(TipoNodo::RETURN),
+          valor(v)
+    {}
+
+    ~NodoReturn() override {
+        delete valor;
+    }
+
+    void imprimir(std::ostream& os, int indent = 0) const override;
+    void generarCodigo(std::ostream& os) const override;
+};
+
+// ----------------------------------------------------------------------------
+// Nodo para llamadas a funciones
+// ----------------------------------------------------------------------------
+struct NodoLlamadaFuncion : public Nodo {
+    NodoIdentificador* nombre;
+    std::vector<Nodo*>* argumentos;
+
+    NodoLlamadaFuncion(NodoIdentificador* n, std::vector<Nodo*>* args)
+        : Nodo(TipoNodo::LLAMADA_FUNCION), nombre(n), argumentos(args) {}
+
+    ~NodoLlamadaFuncion() override {
+        delete nombre;
+        if (argumentos) {
+            for (auto* a : *argumentos) {
+                delete a;
+            }
+            delete argumentos;
+        }
+    }
 
     void imprimir(std::ostream& os, int indent = 0) const override;
     void generarCodigo(std::ostream& os) const override;

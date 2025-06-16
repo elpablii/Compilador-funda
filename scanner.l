@@ -69,6 +69,10 @@ NUEVALINEA     \n
 ")"                      { printf("TOKEN: T_RPAREN (%s)\n", yytext); return T_RPAREN; }
 "{"                      { printf("TOKEN: T_LBRACE (%s)\n", yytext); return T_LBRACE; }
 "}"                      { printf("TOKEN: T_RBRACE (%s)\n", yytext); return T_RBRACE; }
+","                      { printf("TOKEN: T_COMMA (%s)\n", yytext); return T_COMMA; }
+
+"teInvoco"                 { printf("TOKEN: T_FUNCTION (%s)\n", yytext); return T_FUNCTION; }
+"return"                   { printf("TOKEN: T_RETURN (%s)\n", yytext); return T_RETURN; }
 
 {DIGITO}+"."{DIGITO}+ {
     printf("TOKEN: T_FLOAT_LITERAL (%s)\n", yytext);

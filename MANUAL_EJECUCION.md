@@ -32,7 +32,12 @@ Esto generará el ejecutable `mycompiler` dentro de la carpeta del proyecto.
 
 ## 3. Escribir tu Script Star Wars
 
-Crea un archivo de texto (por ejemplo, `mi_script.txt`) usando la sintaxis Star Wars. Puedes basarte en los ejemplos como `ejemplo_starwars.txt` o `logica_compilador.txt`.
+Crea un archivo de texto (por ejemplo, `mi_script.txt`) usando la sintaxis Star Wars. Puedes basarte en los ejemplos como `ejemplo_funciones.txt` o `logica_compilador.txt`.
+
+Ahora puedes usar:
+- Funciones con `teInvoco`, parámetros y return.
+- Llamadas a funciones en cualquier expresión.
+- Imprimir varios valores con `palpatine("texto", var, ...);`
 
 ---
 
@@ -78,17 +83,34 @@ Sigue las instrucciones que aparecen en pantalla.
 
 ---
 
-## 8. Ejemplo Completo
+## 8. Ejemplo Completo con Funciones
 
+```c
+teInvoco r2d2 suma(r2d2 a, r2d2 b) {
+    r2d2 resultado;
+    resultado teOtorgamos a luz b;
+    return resultado;
+}
+
+teInvoco r2d2 main() {
+    r2d2 x teOtorgamos 5;
+    r2d2 y teOtorgamos 7;
+    r2d2 z teOtorgamos suma(x, y);
+    palpatine("Suma:", z);
+    return 0;
+}
+```
+
+Comandos:
 ```sh
 wsl make clean; wsl make
-wsl ./mycompiler logica_compilador.txt
-wsl gcc output.c -o calculadora
-wsl ./calculadora
+wsl ./mycompiler mi_script.txt
+wsl gcc output.c -o mi_programa
+wsl ./mi_programa
 ```
 
 ---
 
-¡Listo! Así puedes ejecutar cualquier script en tu compilador Star Wars.
+¡Listo! Así puedes ejecutar cualquier script en tu compilador Star Wars, ahora con soporte para funciones y return.
 
 ¿Dudas? Consulta los archivos de ejemplo o el manual Star Wars incluido en el proyecto.

@@ -160,12 +160,11 @@ void NodoMientras::imprimir(std::ostream& os, int indent) const {
 
 // Imprime una instrucción de impresión (print)
 void NodoImprimir::imprimir(std::ostream& os, int indent) const {
-    os << std::string(indent, ' ')
-       << "NodoImprimir:\n";
-    if (expresion) {
-        os << std::string(indent + 2, ' ')
-           << "Expresion:\n";
-        expresion->imprimir(os, indent + 4);
+    os << std::string(indent, ' ') << "NodoImprimir:\n";
+    if (expresiones) {
+        for (const auto* e : *expresiones) {
+            if (e) e->imprimir(os, indent + 2);
+        }
     }
 }
 
@@ -312,36 +311,30 @@ void NodoMientras::generarCodigo(std::ostream& os) const {
 
 // Genera el código C para una instrucción de impresión (printf), eligiendo el formato según el tipo de dato.
 void NodoImprimir::generarCodigo(std::ostream& os) const {
-    os << "    printf(";
-    if (expresion) {
-        TipoDato tipo = TipoDato::ENTERO;
-        if (expresion->tipo == TipoNodo::IDENTIFICADOR) {
-            auto* id = static_cast<const NodoIdentificador*>(expresion);
-            auto it = tiposVariables.find(id->nombre);
-            if (it != tiposVariables.end()) tipo = it->second;
-        } else if (expresion->tipo == TipoNodo::LITERAL_CADENA) {
-            tipo = TipoDato::CADENA;
-        } else if (expresion->tipo == TipoNodo::LITERAL_FLOTANTE) {
-            tipo = TipoDato::FLOTANTE;
-        } else if (expresion->tipo == TipoNodo::LITERAL_BOOLEANO) {
-            tipo = TipoDato::BOOLEANO;
+    if (!expresiones || expresiones->empty()) return;
+    // Si el primer argumento es cadena, usar como formato
+    auto* litCad = dynamic_cast<NodoLiteralCadena*>((*expresiones)[0]);
+    if (litCad) {
+        os << "    printf(\"" << litCad->valor << "\"";
+        for (size_t i = 1; i < expresiones->size(); ++i) {
+            os << ", ";
+            (*expresiones)[i]->generarCodigo(os);
         }
-        switch (tipo) {
-            case TipoDato::CADENA:
-                os << "\"%s\\n\", ";
-                break;
-            case TipoDato::FLOTANTE:
-                os << "\"%f\\n\", ";
-                break;
-            case TipoDato::BOOLEANO:
-                os << "\"%d\\n\", ";
-                break;
-            default:
-                os << "\"%d\\n\", ";
+        os << ");\n";
+    } else {
+        // Si no, imprimir todos con %d separados
+        os << "    printf(\"";
+        for (size_t i = 0; i < expresiones->size(); ++i) {
+            if (i > 0) os << " ";
+            os << "%d";
         }
-        expresion->generarCodigo(os);
+        os << "\\n\"";
+        for (size_t i = 0; i < expresiones->size(); ++i) {
+            os << ", ";
+            (*expresiones)[i]->generarCodigo(os);
+        }
+        os << ");\n";
     }
-    os << ");\n";
 }
 
 // Genera el código C para una instrucción de lectura (scanf), asumiendo que la variable es de tipo entero.
@@ -362,4 +355,96 @@ void imprimirAST(Nodo* raiz, std::ostream& os) {
 // Genera el código C a partir del AST completo, comenzando desde la raíz.
 void generarCodigoDesdeAST(Nodo* raiz, std::ostream& os) {
     if (raiz) raiz->generarCodigo(os);
+}
+
+// Imprime una función, mostrando su tipo de retorno, nombre, parámetros y cuerpo
+void NodoFuncion::imprimir(std::ostream& os, int indent) const {
+    os << std::string(indent, ' ') << "NodoFuncion: tipoRetorno=" << tipoDatoAString(tipoRetorno) << "\n";
+    os << std::string(indent + 2, ' ') << "Nombre: ";
+    if (nombre) nombre->imprimir(os, 0);
+    os << std::string(indent + 2, ' ') << "Parametros:\n";
+    if (parametros) {
+        for (const auto* p : *parametros) {
+            if (p) p->imprimir(os, indent + 4);
+        }
+    }
+    os << std::string(indent + 2, ' ') << "Cuerpo:\n";
+    if (cuerpo) cuerpo->imprimir(os, indent + 4);
+}
+
+// Genera el código C para una función, incluyendo su tipo de retorno, nombre, parámetros y cuerpo.
+void NodoFuncion::generarCodigo(std::ostream& os) const {
+    std::string tipo;
+    switch (tipoRetorno) {
+        case TipoDato::ENTERO: tipo = "int"; break;
+        case TipoDato::FLOTANTE: tipo = "float"; break;
+        case TipoDato::CADENA: tipo = "char*"; break;
+        case TipoDato::BOOLEANO: tipo = "int"; break;
+        case TipoDato::VACIO: tipo = "void"; break;
+        default: tipo = "int"; break;
+    }
+    os << tipo << " ";
+    if (nombre) nombre->generarCodigo(os);
+    os << "(";
+    if (parametros) {
+        bool first = true;
+        for (const auto* p : *parametros) {
+            if (!first) os << ", ";
+            std::string t;
+            switch (p->tipoVar) {
+                case TipoDato::ENTERO: t = "int"; break;
+                case TipoDato::FLOTANTE: t = "float"; break;
+                case TipoDato::CADENA: t = "char*"; break;
+                case TipoDato::BOOLEANO: t = "int"; break;
+                default: t = "int"; break;
+            }
+            os << t << " ";
+            if (p->identificador) p->identificador->generarCodigo(os);
+            first = false;
+        }
+    }
+    os << ") {\n";
+    if (cuerpo) cuerpo->generarCodigo(os);
+    os << "}\n";
+}
+
+// Imprime una instrucción de retorno (return), mostrando el valor a retornar
+void NodoReturn::imprimir(std::ostream& os, int indent) const {
+    os << std::string(indent, ' ') << "NodoReturn:\n";
+    if (valor) valor->imprimir(os, indent + 2);
+}
+
+// Genera el código C para una instrucción de retorno, incluyendo el valor a retornar
+void NodoReturn::generarCodigo(std::ostream& os) const {
+    os << "    return ";
+    if (valor) valor->generarCodigo(os);
+    os << ";\n";
+}
+
+// Imprime una llamada a función, mostrando su nombre y argumentos
+void NodoLlamadaFuncion::imprimir(std::ostream& os, int indent) const {
+    os << std::string(indent, ' ') << "NodoLlamadaFuncion:\n";
+    os << std::string(indent + 2, ' ') << "Nombre: ";
+    if (nombre) nombre->imprimir(os, 0);
+    os << std::string(indent + 2, ' ') << "Argumentos:\n";
+    if (argumentos) {
+        for (const auto* a : *argumentos) {
+            if (a) a->imprimir(os, indent + 4);
+        }
+    }
+}
+
+// Genera el código C para una llamada a función, incluyendo su nombre y argumentos
+void NodoLlamadaFuncion::generarCodigo(std::ostream& os) const {
+    if (nombre) nombre->generarCodigo(os);
+    os << "(";
+    if (argumentos) {
+        bool first = true;
+        for (const auto* a : *argumentos) {
+            if (!first) os << ", ";
+            if (a) a->generarCodigo(os);
+            first = false;
+        }
+    }
+    os << ")";
 }

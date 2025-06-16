@@ -35,11 +35,17 @@ void yyerror(const char *mensaje);
     NodoMientras*             nodo_mientras;
     NodoImprimir*             nodo_imprimir;
     NodoLeer*                 nodo_leer;
+    NodoFuncion*              nodo_funcion;
+    NodoReturn*               nodo_return;
+    NodoLlamadaFuncion*       nodo_llamada_funcion;
 
     char*   sval;
     int     ival;
     float   fval;
     TipoDato tipo_dato;
+    std::vector<NodoDeclaracionVariable*>* param_list;
+    std::vector<Nodo*>*       expr_list;
+    std::vector<Nodo*>*       nodo_expr_list;
 }
 
 /* Definición de tokens personalizados Star Wars */
@@ -54,9 +60,11 @@ void yyerror(const char *mensaje);
 %token T_ASSIGN T_PLUS T_MINUS T_MULTIPLY T_DIVIDE
 %token T_EQ T_NEQ T_LT T_GT T_LTE T_GTE
 %token T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_SEMICOLON
+%token T_COMMA
 %token T_ERROR
 %token T_BOOL T_TRUE T_FALSE
 %token T_AND T_OR T_NOT
+%token T_FUNCTION T_RETURN
 
 /* Tipos para no-terminales */
 %type <nodo> program statement expression arithmetic_expression term factor primary_expression comparison_expression
@@ -70,6 +78,13 @@ void yyerror(const char *mensaje);
 %type <nodo_leer> read_statement
 %type <tipo_dato> type_specifier
 %type <nodo> bool_literal
+%type <nodo_funcion> function_declaration
+%type <nodo_return> return_statement
+%type <param_list> parameter_list parameter_list_nonempty
+%type <nodo_decl_var> parameter_declaration
+%type <nodo_llamada_funcion> function_call
+%type <expr_list> argument_list argument_list_nonempty
+%type <nodo_expr_list> print_arg_list print_arg_list_nonempty
 
 /* Precedencia de operadores */
 %left T_EQ T_NEQ
@@ -127,6 +142,14 @@ statement:
         $$ = $1;
     }
   | block
+    {
+        $$ = $1;
+    }
+  | function_declaration
+    {
+        $$ = $1;
+    }
+  | return_statement
     {
         $$ = $1;
     }
@@ -197,12 +220,19 @@ while_statement:
 ;
 
 print_statement:
-    T_PRINT T_LPAREN expression T_RPAREN T_SEMICOLON
+    T_PRINT T_LPAREN print_arg_list T_RPAREN T_SEMICOLON
     {
         $$ = new NodoImprimir($3);
     }
 ;
-
+print_arg_list:
+      /* vacío */ { $$ = new std::vector<Nodo*>(); }
+    | print_arg_list_nonempty { $$ = $1; }
+;
+print_arg_list_nonempty:
+      expression { auto v = new std::vector<Nodo*>(); v->push_back($1); $$ = v; }
+    | print_arg_list_nonempty T_COMMA expression { $1->push_back($3); $$ = $1; }
+;
 read_statement:
     T_READ T_LPAREN identifier T_RPAREN T_SEMICOLON
     {
@@ -215,6 +245,7 @@ expression:
   | expression T_OR expression { $$ = new NodoOperacionBinaria("||", $1, $3); }
   | T_NOT expression           { $$ = new NodoOperacionBinaria("!", $2, nullptr); }
   | comparison_expression     { $$ = $1; }
+  | function_call             { $$ = $1; }
 ;
 
 comparison_expression:
@@ -298,6 +329,7 @@ primary_expression:
     { $$ = $1; }
   | T_LPAREN expression T_RPAREN
     { $$ = $2; }
+  | function_call { $$ = $1; }
 ;
 bool_literal:
       T_TRUE  { $$ = new NodoLiteralBooleano(true); }
@@ -311,6 +343,41 @@ identifier:
         free($1);
         $$ = new NodoIdentificador(nombre);
     }
+;
+
+function_declaration:
+    T_FUNCTION type_specifier identifier T_LPAREN parameter_list T_RPAREN block
+    {
+        $$ = new NodoFuncion($2, $3, $5, $7);
+    }
+;
+
+parameter_list:
+      /* vacío */ { $$ = new std::vector<NodoDeclaracionVariable*>(); }
+    | parameter_list_nonempty { $$ = $1; }
+;
+parameter_list_nonempty:
+      parameter_declaration { auto v = new std::vector<NodoDeclaracionVariable*>(); v->push_back($1); $$ = v; }
+    | parameter_list_nonempty T_COMMA parameter_declaration { $1->push_back($3); $$ = $1; }
+;
+parameter_declaration:
+    type_specifier identifier { $$ = new NodoDeclaracionVariable($1, $2, nullptr); }
+;
+
+return_statement:
+    T_RETURN expression T_SEMICOLON { $$ = new NodoReturn($2); }
+;
+
+function_call:
+    identifier T_LPAREN argument_list T_RPAREN { $$ = new NodoLlamadaFuncion($1, $3); }
+;
+argument_list:
+      /* vacío */ { $$ = new std::vector<Nodo*>(); }
+    | argument_list_nonempty { $$ = $1; }
+;
+argument_list_nonempty:
+      expression { auto v = new std::vector<Nodo*>(); v->push_back($1); $$ = v; }
+    | argument_list_nonempty T_COMMA expression { $1->push_back($3); $$ = $1; }
 ;
 
 %%

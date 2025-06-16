@@ -1,0 +1,27 @@
+// Ejemplo Star Wars: uso de funciones, variables, return, if, while, print
+
+teInvoco r2d2 suma(r2d2 a, r2d2 b) {
+    r2d2 resultado;
+    resultado teOtorgamos a luz b;
+    return resultado;
+}
+
+teInvoco r2d2 factorial(r2d2 n) {
+    r2d2 res teOtorgamos 1;
+    cloneWar (n highground 1) {
+        res teOtorgamos res unlimitedPower n;
+        n teOtorgamos n oscuridad 1;
+    }
+    return res;
+}
+
+teInvoco r2d2 main() {
+    r2d2 x teOtorgamos 5;
+    r2d2 y teOtorgamos 7;
+    r2d2 z;
+    z teOtorgamos suma(x, y);
+    palpatine("Suma: ", z);
+    r2d2 f teOtorgamos factorial(z);
+    palpatine("Factorial: ", f);
+    return 0;
+}
