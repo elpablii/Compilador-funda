@@ -1,6 +1,6 @@
-# Compilador Star Wars
+# Compilador ForceCode
 
-¡Bienvenido a tu compilador temático de Star Wars! Este proyecto implementa un compilador para un lenguaje propio, usando Flex, Bison y C++. Todas las palabras clave y tokens están inspirados en el universo de Star Wars, haciendo el aprendizaje de compiladores mucho más divertido.
+¡Bienvenido al compilador ForceCode! Este proyecto implementa un compilador para un lenguaje propio, usando Flex, Bison y C++. Todas las palabras clave y tokens están inspirados en el universo de Star Wars, haciendo el aprendizaje de compiladores mucho más divertido de hacer.
 
 ## Características principales
 - **Tokens temáticos**: Palabras clave como `r2d2` (entero), `c3p0` (flotante), `jedi` (if), `sith` (else), `obiwan` (verdadero), `anakin` (falso), y muchas más.
@@ -27,7 +27,7 @@ teInvoco r2d2 main() {
 ```
 
 ## Compilación y ejecución
-1. Instala dependencias (en Linux/WSL):
+1. Instala las dependencias (en Linux/WSL):
    ```sh
    sudo apt update
    sudo apt install build-essential flex bison
@@ -46,7 +46,7 @@ teInvoco r2d2 main() {
    wsl ./programa
    ```
 
-## Manual de uso: ¿Cómo programar en el Lenguaje Star Wars?
+## Manual de uso: ¿Cómo programar en el Lenguaje ForceCode?
 
 ### 1. Declaración de variables
 - `r2d2` — Entero
@@ -102,7 +102,7 @@ teInvoco r2d2 suma(r2d2 a, r2d2 b) {
 ```
 
 ### 5. Llamada a funciones
-Puedes llamar funciones en cualquier expresión:
+Puedes invocar funciones en cualquier expresión:
 ```c
 r2d2 total teOtorgamos suma(3, 4);
 ```
@@ -140,12 +140,8 @@ palpatine("Resultado:", total);
 
 ---
 
-¡Con estos comandos puedes crear tus propios programas en el lenguaje Star Wars! Consulta los ejemplos incluidos para más inspiración.
-
 ## Manuales y ejemplos
 - Consulta `MANUAL_EJECUCION.md` para instrucciones detalladas de compilación y ejecución.
-- Consulta `MANUAL_STARWARS.md` para la referencia completa del lenguaje.
+- Consulta `MANUAL_FORCECODE.md` para la referencia completa del lenguaje.
 - Ejemplos: `ejemplo_funciones.txt`, `logica_compilador.txt`, `ejemplo_starwars.txt`.
 
-## Créditos
-Desarrollado por el equipo de compiladores. ¡Que la fuerza te acompañe!

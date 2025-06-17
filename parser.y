@@ -190,14 +190,30 @@ variable_declaration:
     }
   | type_specifier identifier T_ASSIGN expression T_SEMICOLON
     {
-        $$ = new NodoDeclaracionVariable($1, $2, $4);
+        // Si es un entero y la expresión es flotante, convertimos implícitamente
+        if ($1 == TipoDato::ENTERO && dynamic_cast<NodoLiteralFlotante*>($4)) {
+            auto* flotante = static_cast<NodoLiteralFlotante*>($4);
+            auto* entero = new NodoLiteralEntero(static_cast<int>(flotante->valor));
+            delete $4;
+            $$ = new NodoDeclaracionVariable($1, $2, entero);
+        } else {
+            $$ = new NodoDeclaracionVariable($1, $2, $4);
+        }
     }
 ;
 
 assignment_statement:
     identifier T_ASSIGN expression T_SEMICOLON
     {
-        $$ = new NodoAsignacion($1, $3);
+        // Si la variable es entera y la expresión es flotante, convertimos implícitamente
+        if (dynamic_cast<NodoLiteralFlotante*>($3)) {
+            auto* flotante = static_cast<NodoLiteralFlotante*>($3);
+            auto* entero = new NodoLiteralEntero(static_cast<int>(flotante->valor));
+            delete $3;
+            $$ = new NodoAsignacion($1, entero);
+        } else {
+            $$ = new NodoAsignacion($1, $3);
+        }
     }
 ;
 
@@ -317,20 +333,40 @@ factor:
 ;
 
 primary_expression:
-      identifier
-    { $$ = $1; }
-  | T_INTEGER_LITERAL
-    { $$ = new NodoLiteralEntero($1); }
+      T_INTEGER_LITERAL
+    {
+        $$ = new NodoLiteralEntero($1);
+    }
   | T_FLOAT_LITERAL
-    { $$ = new NodoLiteralFlotante($1); }
+    {
+        $$ = new NodoLiteralFlotante($1);
+    }
   | T_STRING_LITERAL
-    { std::string cad($1); free($1); $$ = new NodoLiteralCadena(cad); }
-  | bool_literal
-    { $$ = $1; }
+    {
+        $$ = new NodoLiteralCadena($1);
+    }
+  | T_TRUE
+    {
+        $$ = new NodoLiteralBooleano(true);
+    }
+  | T_FALSE
+    {
+        $$ = new NodoLiteralBooleano(false);
+    }
+  | identifier
+    {
+        $$ = $1;
+    }
   | T_LPAREN expression T_RPAREN
-    { $$ = $2; }
-  | function_call { $$ = $1; }
+    {
+        $$ = $2;
+    }
+  | function_call
+    {
+        $$ = $1;
+    }
 ;
+
 bool_literal:
       T_TRUE  { $$ = new NodoLiteralBooleano(true); }
     | T_FALSE { $$ = new NodoLiteralBooleano(false); }

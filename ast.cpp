@@ -9,12 +9,12 @@
 // Devuelve el nombre textual del tipo de dato
 std::string tipoDatoAString(TipoDato dt) {
     switch (dt) {
-        case TipoDato::ENTERO:    return "ENTERO";
-        case TipoDato::FLOTANTE:  return "FLOTANTE";
-        case TipoDato::CADENA:    return "CADENA";
-        case TipoDato::BOOLEANO:  return "BOOLEANO";
-        case TipoDato::VACIO:     return "VACIO";
-        default:                  return "TIPO_DESCONOCIDO";
+        case TipoDato::ENTERO:    return "float";
+        case TipoDato::FLOTANTE:  return "float";
+        case TipoDato::CADENA:    return "char*";
+        case TipoDato::BOOLEANO:  return "int";
+        case TipoDato::VACIO:     return "void";
+        default:                  return "float";
     }
 }
 
@@ -277,32 +277,17 @@ void NodoIdentificador::generarCodigo(std::ostream& os) const {
 // Genera el código C para una operación binaria (aritmética, lógica, etc.).
 // Si la operación es negación lógica (!), solo utiliza el operando izquierdo.
 void NodoOperacionBinaria::generarCodigo(std::ostream& os) const {
-    if (op == "!") {
-        os << "(!";
-        if (izquierda) izquierda->generarCodigo(os);
-        os << ")";
-        return;
-    }
     os << "(";
-    if (izquierda) izquierda->generarCodigo(os);
+    izquierda->generarCodigo(os);
     os << " " << op << " ";
-    if (derecha) derecha->generarCodigo(os);
+    derecha->generarCodigo(os);
     os << ")";
 }
 
 // Genera el código C para la declaración de una variable, incluyendo su tipo y posible inicialización.
 void NodoDeclaracionVariable::generarCodigo(std::ostream& os) const {
-    std::string tipo;
-    switch (tipoVar) {
-        case TipoDato::ENTERO: tipo = "int"; break;
-        case TipoDato::FLOTANTE: tipo = "float"; break;
-        case TipoDato::CADENA: tipo = "char*"; break;
-        case TipoDato::BOOLEANO: tipo = "int"; break; // Representar booleanos como int en C
-        default: tipo = "int"; break;
-    }
-    if (identificador) tiposVariables[identificador->nombre] = tipoVar;
-    os << "    " << tipo << " ";
-    if (identificador) identificador->generarCodigo(os);
+    os << tipoDatoAString(tipoVar) << " ";
+    identificador->generarCodigo(os);
     if (inicializacion) {
         os << " = ";
         inicializacion->generarCodigo(os);
@@ -312,10 +297,9 @@ void NodoDeclaracionVariable::generarCodigo(std::ostream& os) const {
 
 // Genera el código C para una asignación de variable.
 void NodoAsignacion::generarCodigo(std::ostream& os) const {
-    os << "    ";
-    if (identificador) identificador->generarCodigo(os);
+    identificador->generarCodigo(os);
     os << " = ";
-    if (expresion) expresion->generarCodigo(os);
+    expresion->generarCodigo(os);
     os << ";\n";
 }
 
@@ -349,10 +333,14 @@ void NodoImprimir::generarCodigo(std::ostream& os) const {
     auto* litCad = dynamic_cast<NodoLiteralCadena*>((*expresiones)[0]);
     if (litCad) {
         os << "    printf(\"" << litCad->valor;
-        // Si hay más argumentos, agregar %d por cada uno
         if (expresiones->size() > 1) {
             for (size_t i = 1; i < expresiones->size(); ++i) {
-                os << " %d";
+                auto* litNum = dynamic_cast<NodoLiteralEntero*>((*expresiones)[i]);
+                if (litNum) {
+                    os << " %.0f";
+                } else {
+                    os << " %f";
+                }
             }
             os << "\\n";
         }
@@ -363,11 +351,15 @@ void NodoImprimir::generarCodigo(std::ostream& os) const {
         }
         os << ");\n";
     } else {
-        // Si no, imprimir todos con %d separados
         os << "    printf(\"";
         for (size_t i = 0; i < expresiones->size(); ++i) {
             if (i > 0) os << " ";
-            os << "%d";
+            auto* litNum = dynamic_cast<NodoLiteralEntero*>((*expresiones)[i]);
+            if (litNum) {
+                os << "%.0f";
+            } else {
+                os << "%f";
+            }
         }
         os << "\\n\"";
         for (size_t i = 0; i < expresiones->size(); ++i) {
@@ -380,7 +372,7 @@ void NodoImprimir::generarCodigo(std::ostream& os) const {
 
 // Genera el código C para una instrucción de lectura (scanf), asumiendo que la variable es de tipo entero.
 void NodoLeer::generarCodigo(std::ostream& os) const {
-    os << "    scanf(\"%d\", &";
+    os << "    scanf(\"%f\", &";
     if (identificador && identificador->tipo == TipoNodo::IDENTIFICADOR) {
         identificador->generarCodigo(os);
     }
@@ -417,12 +409,12 @@ void NodoFuncion::imprimir(std::ostream& os, int indent) const {
 void NodoFuncion::generarCodigo(std::ostream& os) const {
     std::string tipo;
     switch (tipoRetorno) {
-        case TipoDato::ENTERO: tipo = "int"; break;
+        case TipoDato::ENTERO: tipo = "float"; break;
         case TipoDato::FLOTANTE: tipo = "float"; break;
         case TipoDato::CADENA: tipo = "char*"; break;
         case TipoDato::BOOLEANO: tipo = "int"; break;
         case TipoDato::VACIO: tipo = "void"; break;
-        default: tipo = "int"; break;
+        default: tipo = "float"; break;
     }
     os << tipo << " ";
     if (nombre) nombre->generarCodigo(os);
@@ -433,11 +425,11 @@ void NodoFuncion::generarCodigo(std::ostream& os) const {
             if (!first) os << ", ";
             std::string t;
             switch (p->tipoVar) {
-                case TipoDato::ENTERO: t = "int"; break;
+                case TipoDato::ENTERO: t = "float"; break;
                 case TipoDato::FLOTANTE: t = "float"; break;
                 case TipoDato::CADENA: t = "char*"; break;
                 case TipoDato::BOOLEANO: t = "int"; break;
-                default: t = "int"; break;
+                default: t = "float"; break;
             }
             os << t << " ";
             if (p->identificador) p->identificador->generarCodigo(os);

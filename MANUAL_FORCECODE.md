@@ -1,6 +1,6 @@
-# Manual de uso del Lenguaje Star Wars
+# Manual de uso del Lenguaje ForceCode
 
-Este manual te enseña a programar usando el compilador temático de Star Wars. Aquí encontrarás la sintaxis, ejemplos y tips para aprovechar todas las características del lenguaje.
+Este manual te enseña a programar usando el compilador temático de ForceCode. Aquí encontrarás la sintaxis, ejemplos y tips para aprovechar todas las características del lenguaje.
 
 ## 1. Declaración de variables
 - `r2d2` — Entero
@@ -44,7 +44,7 @@ vidas teOtorgamos vidas luz 1;
 
 ## 4. Funciones y return
 - Declaración: `teInvoco tipo nombre(parámetros) { ... }`
-- Parámetros separados por coma, pueden ser de cualquier tipo Star Wars.
+- Parámetros separados por coma, pueden ser de cualquier tipo ForceCode.
 - Retorna un valor con `return valor;`.
 - Llama funciones como `resultado teOtorgamos suma(x, y);`
 
@@ -96,4 +96,4 @@ palpatine("Resultado:", total);
 
 ---
 
-¡Con este manual puedes crear tus propios programas en el lenguaje Star Wars! Consulta los ejemplos incluidos para más inspiración.
+¡Con este manual puedes crear tus propios programas en el lenguaje ForceCode! Para una mayor inspiración o entendimiento, consulte los ejemplos incluidos.

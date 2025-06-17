@@ -41,9 +41,11 @@ static TipoDato obtenerTipo(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorS
             TipoDato izq = obtenerTipo(bin->izquierda, tabla, errores);
             TipoDato der = obtenerTipo(bin->derecha, tabla, errores);
             if (izq == der) return izq;
-            if ((izq == TipoDato::ENTERO && der == TipoDato::FLOTANTE) ||
-                (izq == TipoDato::FLOTANTE && der == TipoDato::ENTERO))
-                return TipoDato::FLOTANTE;
+            // Permitir conversión implícita de flotante a entero
+            if (izq == TipoDato::ENTERO && der == TipoDato::FLOTANTE)
+                return TipoDato::ENTERO;
+            if (izq == TipoDato::FLOTANTE && der == TipoDato::ENTERO)
+                return TipoDato::ENTERO;
             errores.push_back({"Operación entre tipos incompatibles", 0});
             return TipoDato::VACIO;
         }
@@ -90,9 +92,9 @@ static void recorrerAST(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSeman
             }
             if (decl->inicializacion) {
                 TipoDato tipoInit = obtenerTipo(decl->inicializacion, tabla, errores);
-                // Permitir asignación entre int y bool
+                // Permitir asignación entre int y bool, y conversión implícita de flotante a entero
                 if (!((decl->tipoVar == tipoInit) ||
-                      (decl->tipoVar == TipoDato::ENTERO && tipoInit == TipoDato::BOOLEANO) ||
+                      (decl->tipoVar == TipoDato::ENTERO && (tipoInit == TipoDato::BOOLEANO || tipoInit == TipoDato::FLOTANTE)) ||
                       (decl->tipoVar == TipoDato::BOOLEANO && tipoInit == TipoDato::ENTERO) ||
                       tipoInit == TipoDato::VACIO)) {
                     errores.push_back({"Inicialización de tipo incompatible para variable: " + nombre, 0});
@@ -108,9 +110,9 @@ static void recorrerAST(Nodo* nodo, TablaSimbolos& tabla, std::vector<ErrorSeman
                 errores.push_back({"Variable no declarada: " + nombre, 0});
             } else {
                 TipoDato tipoExpr = obtenerTipo(asig->expresion, tabla, errores);
-                // Permitir asignación entre int y bool
+                // Permitir asignación entre int y bool, y conversión implícita de flotante a entero
                 if (!((it->second.tipo == tipoExpr) ||
-                      (it->second.tipo == TipoDato::ENTERO && tipoExpr == TipoDato::BOOLEANO) ||
+                      (it->second.tipo == TipoDato::ENTERO && (tipoExpr == TipoDato::BOOLEANO || tipoExpr == TipoDato::FLOTANTE)) ||
                       (it->second.tipo == TipoDato::BOOLEANO && tipoExpr == TipoDato::ENTERO) ||
                       tipoExpr == TipoDato::VACIO)) {
                     errores.push_back({"Asignación de tipo incompatible a variable: " + nombre, 0});

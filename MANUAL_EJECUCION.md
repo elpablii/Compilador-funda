@@ -1,6 +1,6 @@
-# Manual para Ejecutar tus Scripts en el Compilador Star Wars
+# Manual para ejecutar el Compilador ForceCode
 
-Este manual te guía paso a paso para compilar y ejecutar tus scripts escritos en el lenguaje Star Wars usando tu compilador personalizado.
+Este manual guía paso a paso para compilar y ejecutar los scripts escritos en el lenguaje ForceCode usando este compilador:
 
 ---
 
@@ -20,7 +20,7 @@ sudo apt install build-essential flex bison
 
 ---
 
-## 2. Compilar el Compilador Star Wars
+## 2. Compilar el Compilador ForceCode
 
 Abre una terminal en la carpeta del proyecto y ejecuta:
 ```sh
@@ -30,9 +30,9 @@ Esto generará el ejecutable `mycompiler` dentro de la carpeta del proyecto.
 
 ---
 
-## 3. Escribir tu Script Star Wars
+## 3. Escribir tu Script ForceCode
 
-Crea un archivo de texto (por ejemplo, `mi_script.txt`) usando la sintaxis Star Wars. Puedes basarte en los ejemplos como `ejemplo_funciones.txt` o `logica_compilador.txt`.
+Crea un archivo de texto (por ejemplo, `mi_script.txt`) usando la sintaxis de ForceCode. Puedes basarte en los ejemplos como `ejemplo_funciones.txt` o `logica_compilador.txt`.
 
 Ahora puedes usar:
 - Funciones con `teInvoco`, parámetros y return.
@@ -41,13 +41,13 @@ Ahora puedes usar:
 
 ---
 
-## 4. Compilar tu Script Star Wars
+## 4. Compilar tu Script ForceCode
 
 Ejecuta en la terminal:
 ```sh
 wsl ./mycompiler mi_script.txt
 ```
-Esto generará un archivo `output.c` con el código C equivalente a tu script Star Wars.
+Esto generará un archivo `output.c` con el código C equivalente a tu script ForceCode.
 
 ---
 
@@ -67,7 +67,7 @@ Ejecuta tu programa con:
 ```sh
 wsl ./mi_programa
 ```
-Sigue las instrucciones que aparecen en pantalla.
+Siga las instrucciones que aparecen en pantalla.
 
 ---
 
@@ -111,6 +111,6 @@ wsl ./mi_programa
 
 ---
 
-¡Listo! Así puedes ejecutar cualquier script en tu compilador Star Wars, ahora con soporte para funciones y return.
+¡Listo! Con eso puedes ejecutar cualquier script en tu compilador de ForceCode, ahora con soporte para funciones y return.
 
-¿Dudas? Consulta los archivos de ejemplo o el manual Star Wars incluido en el proyecto.
+¿Dudas? Consulta los archivos de ejemplo o el manual ForceCode incluido en el proyecto.
